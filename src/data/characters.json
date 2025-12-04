@@ -1,0 +1,42 @@
+{
+  "characters": [
+    {
+      "id": "tux",
+      "name": "Tux",
+      "displayName": "Tux",
+      "color": "#FFD700",
+      "sprites": {
+        "neutral": "/characters/tux/neutral.png",
+        "happy": "/characters/tux/happy.png",
+        "sad": "/characters/tux/sad.png",
+        "angry": "/characters/tux/angry.png",
+        "surprised": "/characters/tux/surprised.png",
+        "determined": "/characters/tux/determined.png"
+      }
+    },
+    {
+      "id": "player",
+      "name": "Joueur",
+      "displayName": "???",
+      "color": "#87CEEB",
+      "sprites": {
+        "neutral": "/characters/player/neutral.png",
+        "happy": "/characters/player/happy.png",
+        "worried": "/characters/player/worried.png",
+        "surprised": "/characters/player/surprised.png",
+        "determined": "/characters/player/determined.png"
+      }
+    },
+    {
+      "id": "windows-boss",
+      "name": "Clippy",
+      "displayName": "???",
+      "color": "#00A4EF",
+      "sprites": {
+        "neutral": "/characters/windows-boss/neutral.png",
+        "angry": "/characters/windows-boss/angry.png",
+        "smirk": "/characters/windows-boss/smirk.png"
+      }
+    }
+  ]
+}

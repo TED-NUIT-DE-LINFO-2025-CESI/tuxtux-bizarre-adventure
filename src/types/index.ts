@@ -1,0 +1,23 @@
+// Re-export all types from schemas (Zod-inferred)
+export type {
+  EmotionType,
+  CharacterPosition,
+  CharacterSprite,
+  CharacterDefinition,
+  DialogueLine,
+  GameCondition,
+  Choice,
+  SceneCharacterState,
+  SceneEvent,
+  Scene,
+  Chapter,
+  GamePath,
+  GameScreen,
+  GameFlags,
+  ChoiceHistoryEntry,
+  DialogueHistoryEntry,
+  GameProgress,
+  SaveData,
+  SaveSlotInfo,
+  GameSettings,
+} from '../schemas';
