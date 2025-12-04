@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 * {
   margin: 0;
   padding: 0;
@@ -5,18 +7,11 @@
 }
 
 :root {
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family: 'Fira Code', 'Segoe UI', system-ui, -apple-system, monospace;
   line-height: 1.5;
-  font-weight: 400;
-
   color-scheme: dark;
   color: #fff;
   background-color: #0a0a0f;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 html, body, #root {
@@ -25,26 +20,7 @@ html, body, #root {
   overflow: hidden;
 }
 
-button {
-  font-family: inherit;
-  border: none;
-  background: none;
-  cursor: pointer;
-  outline: none;
-}
-
-button:focus-visible {
-  outline: 2px solid #FFD700;
-  outline-offset: 2px;
-}
-
-/* Selection color */
-::selection {
-  background: rgba(255, 215, 0, 0.3);
-  color: #fff;
-}
-
-/* Scrollbar styling */
+/* Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -56,8 +32,4 @@ button:focus-visible {
 ::-webkit-scrollbar-thumb {
   background: rgba(255, 215, 0, 0.3);
   border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 215, 0, 0.5);
 }

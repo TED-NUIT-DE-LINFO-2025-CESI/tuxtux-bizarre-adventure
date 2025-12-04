@@ -1,308 +1,201 @@
+import { useMemo } from 'react';
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import type {
-  GamePath,
-  GameFlags,
-  ChoiceHistoryEntry,
-  DialogueHistoryEntry,
-  GameScreen,
-  Scene,
-  DialogueLine,
-  Choice,
-  CharacterSprite,
-  EmotionType,
-} from '../schemas';
+import { devtools, persist } from 'zustand/middleware';
+import { SCENES, INITIAL_HEALTH, BATTLE_ATTACKS, type Scene, type Choice } from '../data/scenes';
 
-interface GameState {
-  // Navigation
-  currentScreen: GameScreen;
+// ============================================================================
+// TYPES
+// ============================================================================
 
-  // Story Progress
-  currentPath: GamePath;
-  currentSceneId: string;
-  currentDialogueIndex: number;
-  currentScene: Scene | null;
+type GamePath = 'windows' | 'linux' | null;
 
-  // Character Display
-  visibleCharacters: CharacterSprite[];
-
-  // Dialogue State
-  currentDialogue: DialogueLine | null;
-  isTextComplete: boolean;
-  isAutoPlay: boolean;
-  isSkipping: boolean;
-
-  // Choices
-  availableChoices: Choice[] | null;
-  isShowingChoices: boolean;
-
-  // Flags & Variables
-  flags: GameFlags;
-
-  // History
-  choiceHistory: ChoiceHistoryEntry[];
-  dialogueHistory: DialogueHistoryEntry[];
-
-  // Session
-  playtime: number;
-  isPaused: boolean;
-
-  // Actions
-  setScreen: (screen: GameScreen) => void;
-
-  // Scene Management
-  setCurrentScene: (scene: Scene) => void;
-
-  // Dialogue Progression
-  advanceDialogue: () => void;
-  setTextComplete: (complete: boolean) => void;
-  skipToEnd: () => void;
-
-  // Character Management
-  showCharacter: (sprite: CharacterSprite) => void;
-  hideCharacter: (characterId: string) => void;
-  updateCharacterEmotion: (characterId: string, emotion: EmotionType) => void;
-  clearCharacters: () => void;
-
-  // Choice System
-  showChoices: (choices: Choice[]) => void;
-  selectChoice: (choice: Choice) => void;
-  hideChoices: () => void;
-
-  // Flag Management
-  setFlag: (key: string, value: boolean | number | string) => void;
-  getFlag: (key: string) => boolean | number | string | undefined;
-
-  // Path Selection
-  selectPath: (path: GamePath) => void;
-
-  // History
-  addToDialogueHistory: (entry: DialogueHistoryEntry) => void;
-  addToChoiceHistory: (entry: ChoiceHistoryEntry) => void;
-
-  // Auto/Skip
-  toggleAutoPlay: () => void;
-  toggleSkip: () => void;
-
-  // Game Control
-  startNewGame: () => void;
-  pauseGame: () => void;
-  resumeGame: () => void;
-  resetGame: () => void;
-
-  // Playtime
-  incrementPlaytime: () => void;
+interface Health {
+  tux: number;
+  omega: number;
 }
 
+interface GameState {
+  // State
+  currentSceneId: string;
+  dialogueIndex: number;
+  showChoices: boolean;
+  showBattle: boolean;
+  path: GamePath;
+  health: Health;
+  battlePhase: number;
+
+  // Computed
+  getCurrentScene: () => Scene;
+  getCurrentDialogue: () => Scene['dialogues'][number] | null;
+  isLastDialogue: () => boolean;
+
+  // Actions
+  nextDialogue: () => void;
+  transitionToScene: (sceneId: string) => void;
+  makeChoice: (choice: Choice) => void;
+  processBattlePhase: () => { isComplete: boolean; attack?: typeof BATTLE_ATTACKS[number]; newHealth?: Health };
+  completeBattle: () => void;
+  resetBattle: () => void;
+  resetGame: () => void;
+}
+
+// ============================================================================
+// INITIAL STATE
+// ============================================================================
+
 const initialState = {
-  currentScreen: 'main-menu' as GameScreen,
-  currentPath: null as GamePath,
   currentSceneId: 'intro',
-  currentDialogueIndex: 0,
-  currentScene: null as Scene | null,
-  visibleCharacters: [] as CharacterSprite[],
-  currentDialogue: null as DialogueLine | null,
-  isTextComplete: false,
-  isAutoPlay: false,
-  isSkipping: false,
-  availableChoices: null as Choice[] | null,
-  isShowingChoices: false,
-  flags: {} as GameFlags,
-  choiceHistory: [] as ChoiceHistoryEntry[],
-  dialogueHistory: [] as DialogueHistoryEntry[],
-  playtime: 0,
-  isPaused: false,
+  dialogueIndex: 0,
+  showChoices: false,
+  showBattle: false,
+  path: null as GamePath,
+  health: { ...INITIAL_HEALTH },
+  battlePhase: 0,
 };
 
+// ============================================================================
+// STORE
+// ============================================================================
+
 export const useGameStore = create<GameState>()(
-  persist(
-    (set, get) => ({
-      ...initialState,
+  devtools(
+    persist(
+      (set, get) => ({
+        ...initialState,
 
-      setScreen: (screen) => set({ currentScreen: screen }),
+        // Computed
+        getCurrentScene: () => SCENES[get().currentSceneId],
 
-      setCurrentScene: (scene) =>
-        set({
-          currentScene: scene,
-          currentSceneId: scene.id,
-          currentDialogueIndex: 0,
-          currentDialogue: scene.dialogue[0] || null,
-          isTextComplete: false,
-          isShowingChoices: false,
-          availableChoices: null,
-          visibleCharacters: scene.characters
-            .filter((c) => c.visible)
-            .map((c) => ({
-              characterId: c.characterId,
-              emotion: c.emotion,
-              position: c.position,
-              isActive: false,
-            })),
-        }),
+        getCurrentDialogue: () => {
+          const scene = SCENES[get().currentSceneId];
+          return scene?.dialogues[get().dialogueIndex] || null;
+        },
 
-      advanceDialogue: () => {
-        const { currentScene, currentDialogueIndex, isTextComplete } = get();
+        isLastDialogue: () => {
+          const scene = SCENES[get().currentSceneId];
+          return get().dialogueIndex === scene?.dialogues.length - 1;
+        },
 
-        if (!isTextComplete) {
-          set({ isTextComplete: true });
-          return;
-        }
+        // Actions
+        nextDialogue: () => {
+          const state = get();
+          const scene = SCENES[state.currentSceneId];
 
-        if (!currentScene) return;
-
-        const nextIndex = currentDialogueIndex + 1;
-
-        if (nextIndex >= currentScene.dialogue.length) {
-          if (currentScene.choices && currentScene.choices.length > 0) {
-            set({
-              isShowingChoices: true,
-              availableChoices: currentScene.choices,
-            });
+          if (state.dialogueIndex < scene.dialogues.length - 1) {
+            set({ dialogueIndex: state.dialogueIndex + 1 }, false, 'nextDialogue');
+          } else if (scene.isBattle) {
+            set({ showBattle: true }, false, 'showBattle');
+          } else if (scene.choices) {
+            set({ showChoices: true }, false, 'showChoices');
+          } else if (scene.nextScene) {
+            get().transitionToScene(scene.nextScene);
           }
-        } else {
-          const nextDialogue = currentScene.dialogue[nextIndex];
+        },
+
+        transitionToScene: (sceneId) => {
           set({
-            currentDialogueIndex: nextIndex,
-            currentDialogue: nextDialogue,
-            isTextComplete: false,
-          });
+            currentSceneId: sceneId,
+            dialogueIndex: 0,
+            showChoices: false,
+            showBattle: false,
+          }, false, 'transitionToScene');
+        },
 
-          // Update active character
-          if (nextDialogue.characterId) {
-            const characters = get().visibleCharacters.map((c) => ({
-              ...c,
-              isActive: c.characterId === nextDialogue.characterId,
-            }));
-            set({ visibleCharacters: characters });
+        makeChoice: (choice) => {
+          const updates: Partial<GameState> = {
+            currentSceneId: choice.nextScene,
+            dialogueIndex: 0,
+            showChoices: false,
+            showBattle: false,
+          };
 
-            // Update emotion if specified
-            if (nextDialogue.emotion) {
-              get().updateCharacterEmotion(
-                nextDialogue.characterId,
-                nextDialogue.emotion
-              );
-            }
+          if (choice.nextScene === 'windows_path') {
+            updates.path = 'windows';
+          } else if (choice.nextScene === 'linux_path') {
+            updates.path = 'linux';
           }
-        }
-      },
 
-      setTextComplete: (complete) => set({ isTextComplete: complete }),
+          set(updates as GameState, false, 'makeChoice');
+        },
 
-      skipToEnd: () => set({ isTextComplete: true }),
+        processBattlePhase: () => {
+          const { battlePhase, health } = get();
 
-      showCharacter: (sprite) =>
-        set((state) => ({
-          visibleCharacters: [
-            ...state.visibleCharacters.filter(
-              (c) => c.characterId !== sprite.characterId
-            ),
-            sprite,
-          ],
-        })),
+          if (battlePhase >= BATTLE_ATTACKS.length) {
+            return { isComplete: true };
+          }
 
-      hideCharacter: (characterId) =>
-        set((state) => ({
-          visibleCharacters: state.visibleCharacters.filter(
-            (c) => c.characterId !== characterId
-          ),
-        })),
+          const attack = BATTLE_ATTACKS[battlePhase];
+          const newHealth = { ...health };
 
-      updateCharacterEmotion: (characterId, emotion) =>
-        set((state) => ({
-          visibleCharacters: state.visibleCharacters.map((c) =>
-            c.characterId === characterId ? { ...c, emotion } : c
-          ),
-        })),
+          if (attack.type === 'tux') {
+            newHealth.omega = Math.max(0, health.omega - attack.damage);
+            if (attack.heal) {
+              newHealth.tux = Math.min(100, health.tux + attack.heal);
+            }
+          } else {
+            newHealth.tux = Math.max(0, health.tux - attack.damage);
+          }
 
-      clearCharacters: () => set({ visibleCharacters: [] }),
+          set({
+            health: newHealth,
+            battlePhase: battlePhase + 1,
+          }, false, 'processBattlePhase');
 
-      showChoices: (choices) =>
-        set({
-          availableChoices: choices,
-          isShowingChoices: true,
-        }),
+          return {
+            isComplete: false,
+            attack,
+            newHealth,
+          };
+        },
 
-      selectChoice: (choice) => {
-        const { currentSceneId } = get();
+        completeBattle: () => {
+          const scene = SCENES[get().currentSceneId];
+          if (scene.nextScene) {
+            get().transitionToScene(scene.nextScene);
+          }
+        },
 
-        get().addToChoiceHistory({
-          sceneId: currentSceneId,
-          choiceId: choice.id,
-          timestamp: Date.now(),
-        });
+        resetBattle: () => {
+          set({
+            health: { ...INITIAL_HEALTH },
+            battlePhase: 0,
+          }, false, 'resetBattle');
+        },
 
-        if (choice.setFlags) {
-          Object.entries(choice.setFlags).forEach(([key, value]) => {
-            get().setFlag(key, value);
-          });
-        }
-
-        set({ isShowingChoices: false, availableChoices: null });
-      },
-
-      hideChoices: () =>
-        set({ isShowingChoices: false, availableChoices: null }),
-
-      setFlag: (key, value) =>
-        set((state) => ({
-          flags: { ...state.flags, [key]: value },
-        })),
-
-      getFlag: (key) => get().flags[key],
-
-      selectPath: (path) =>
-        set({
-          currentPath: path,
-          flags: { ...get().flags, selectedPath: path || '' },
-        }),
-
-      addToDialogueHistory: (entry) =>
-        set((state) => ({
-          dialogueHistory: [...state.dialogueHistory, entry].slice(-100),
-        })),
-
-      addToChoiceHistory: (entry) =>
-        set((state) => ({
-          choiceHistory: [...state.choiceHistory, entry],
-        })),
-
-      toggleAutoPlay: () =>
-        set((state) => ({
-          isAutoPlay: !state.isAutoPlay,
-          isSkipping: false,
-        })),
-
-      toggleSkip: () =>
-        set((state) => ({
-          isSkipping: !state.isSkipping,
-          isAutoPlay: false,
-        })),
-
-      startNewGame: () =>
-        set({
-          ...initialState,
-          currentScreen: 'game',
-        }),
-
-      pauseGame: () => set({ isPaused: true }),
-      resumeGame: () => set({ isPaused: false }),
-
-      resetGame: () => set(initialState),
-
-      incrementPlaytime: () =>
-        set((state) => ({
-          playtime: state.playtime + 1,
-        })),
-    }),
-    {
-      name: 'tux-adventure-game',
-      partialize: (state) => ({
-        currentPath: state.currentPath,
-        currentSceneId: state.currentSceneId,
-        flags: state.flags,
-        choiceHistory: state.choiceHistory,
-        playtime: state.playtime,
+        resetGame: () => {
+          set(initialState, false, 'resetGame');
+        },
       }),
-    }
+      { name: 'tux-game-store' }
+    ),
+    { name: 'game-store' }
   )
 );
+
+// ============================================================================
+// SELECTOR HOOKS - Optimized re-renders
+// ============================================================================
+
+export const useCurrentScene = () => useGameStore((state) => SCENES[state.currentSceneId]);
+export const useDialogueIndex = () => useGameStore((state) => state.dialogueIndex);
+export const useShowChoices = () => useGameStore((state) => state.showChoices);
+export const useShowBattle = () => useGameStore((state) => state.showBattle);
+export const usePath = () => useGameStore((state) => state.path);
+export const useHealth = () => useGameStore((state) => state.health);
+export const useBattlePhase = () => useGameStore((state) => state.battlePhase);
+
+// Actions - accessed directly from store (stable references)
+export const getGameActions = () => ({
+  nextDialogue: useGameStore.getState().nextDialogue,
+  makeChoice: useGameStore.getState().makeChoice,
+  transitionToScene: useGameStore.getState().transitionToScene,
+  processBattlePhase: useGameStore.getState().processBattlePhase,
+  completeBattle: useGameStore.getState().completeBattle,
+  resetGame: useGameStore.getState().resetGame,
+});
+
+// Hook version with useMemo for stable reference
+export const useGameActions = () => {
+  return useMemo(() => getGameActions(), []);
+};

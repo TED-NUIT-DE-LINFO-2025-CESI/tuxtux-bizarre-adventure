@@ -1,6 +1,14 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { GameSettings } from '../schemas';
+
+interface GameSettings {
+  textSpeed: number;
+  autoPlaySpeed: number;
+  masterVolume: number;
+  bgmVolume: number;
+  sfxVolume: number;
+  fullscreen: boolean;
+}
 
 interface SettingsState extends GameSettings {
   setTextSpeed: (speed: number) => void;
@@ -8,10 +16,7 @@ interface SettingsState extends GameSettings {
   setMasterVolume: (volume: number) => void;
   setBgmVolume: (volume: number) => void;
   setSfxVolume: (volume: number) => void;
-  setVoiceVolume: (volume: number) => void;
   toggleFullscreen: () => void;
-  toggleSkipUnread: () => void;
-  toggleQuickMenu: () => void;
   resetToDefaults: () => void;
 }
 
@@ -21,10 +26,7 @@ const defaultSettings: GameSettings = {
   masterVolume: 80,
   bgmVolume: 70,
   sfxVolume: 80,
-  voiceVolume: 100,
   fullscreen: false,
-  skipUnread: false,
-  showQuickMenu: true,
 };
 
 export const useSettingsStore = create<SettingsState>()(
@@ -37,15 +39,9 @@ export const useSettingsStore = create<SettingsState>()(
       setMasterVolume: (volume) => set({ masterVolume: volume }),
       setBgmVolume: (volume) => set({ bgmVolume: volume }),
       setSfxVolume: (volume) => set({ sfxVolume: volume }),
-      setVoiceVolume: (volume) => set({ voiceVolume: volume }),
       toggleFullscreen: () => set((state) => ({ fullscreen: !state.fullscreen })),
-      toggleSkipUnread: () => set((state) => ({ skipUnread: !state.skipUnread })),
-      toggleQuickMenu: () =>
-        set((state) => ({ showQuickMenu: !state.showQuickMenu })),
       resetToDefaults: () => set(defaultSettings),
     }),
-    {
-      name: 'tux-adventure-settings',
-    }
+    { name: 'tux-adventure-settings' }
   )
 );
