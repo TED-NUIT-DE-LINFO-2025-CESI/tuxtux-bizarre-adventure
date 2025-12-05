@@ -1,6 +1,7 @@
-import { memo } from 'react';
+import { memo, useCallback } from 'react';
 import { motion } from 'motion/react';
 import type { Choice } from '../../data/scenes';
+import { useAudio } from '../../hooks/useAudio';
 
 interface ChoicePanelProps {
   choices: Choice[];
@@ -8,6 +9,17 @@ interface ChoicePanelProps {
 }
 
 export const ChoicePanel = memo(({ choices, onChoice }: ChoicePanelProps) => {
+  const { playSFX } = useAudio();
+
+  const handleHover = useCallback(() => {
+    playSFX('choiceHover');
+  }, [playSFX]);
+
+  const handleClick = useCallback((choice: Choice) => {
+    playSFX('choiceSelect');
+    onChoice(choice);
+  }, [playSFX, onChoice]);
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
@@ -27,7 +39,8 @@ export const ChoicePanel = memo(({ choices, onChoice }: ChoicePanelProps) => {
           transition={{ delay: index * 0.1 }}
           whileHover={{ scale: 1.02, x: 10 }}
           whileTap={{ scale: 0.98 }}
-          onClick={() => onChoice(choice)}
+          onHoverStart={handleHover}
+          onClick={() => handleClick(choice)}
           className={`
             w-full p-5 text-left rounded-xl cursor-pointer
             bg-gray-900/80 border-2 border-gray-600

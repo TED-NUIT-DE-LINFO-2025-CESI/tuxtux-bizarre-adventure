@@ -23,6 +23,7 @@ export interface Scene {
   id: string;
   title: string;
   atmosphere: Atmosphere;
+  bgm?: string;
   dialogues: Dialogue[];
   choices?: Choice[];
   nextScene?: string;
@@ -34,6 +35,7 @@ export const SCENES: Record<string, Scene> = {
     id: 'intro',
     title: 'Prologue',
     atmosphere: 'neutral',
+    bgm: 'intro',
     dialogues: [
       { speaker: 'narrator', text: "Annee 2045. Le monde numerique est divise en deux empires..." },
       { speaker: 'narrator', text: "D'un cote, MICROSOFT OMEGA - une IA nee de Windows qui controle 89% des systemes mondiaux." },
@@ -60,6 +62,7 @@ export const SCENES: Record<string, Scene> = {
     id: 'windows_path',
     title: 'Acte I - Le Monde Windows',
     atmosphere: 'windows',
+    bgm: 'windows',
     dialogues: [
       { speaker: 'narrator', text: "Vous avez choisi la facilite. Le monde Windows vous accueille..." },
       { speaker: 'clippy', text: "Bienvenue ! Je vois que vous essayez de vivre. Voulez-vous de l'aide ?", position: 'right' },
@@ -79,6 +82,7 @@ export const SCENES: Record<string, Scene> = {
     id: 'windows_collapse',
     title: 'Acte II - L\'Effondrement',
     atmosphere: 'chaos',
+    bgm: 'chaos',
     dialogues: [
       { speaker: 'gates', text: "MISE A JOUR FORCEE INITIEE.", position: 'center' },
       { speaker: 'gates', text: "VOTRE LIBRE ARBITRE SERA REDEMARRE DANS 10... 9...", position: 'center' },
@@ -98,6 +102,7 @@ export const SCENES: Record<string, Scene> = {
     id: 'linux_path',
     title: 'Acte I - La Resistance',
     atmosphere: 'linux',
+    bgm: 'linux',
     dialogues: [
       { speaker: 'narrator', text: "Vous avez choisi la liberte. L'Ecole Linux vous attend..." },
       { speaker: 'narrator', text: "Un terminal s'ouvre devant vous. Le curseur clignote." },
@@ -118,6 +123,7 @@ export const SCENES: Record<string, Scene> = {
     id: 'linux_rescue',
     title: 'Acte II - La Mission',
     atmosphere: 'linux',
+    bgm: 'linux',
     dialogues: [
       { speaker: 'narrator', text: "Vous traversez le reseau, sautant de serveur en serveur..." },
       { speaker: 'player', text: "$ ssh -i freedom_key debian_school@resistance.net", position: 'left' },
@@ -138,6 +144,7 @@ export const SCENES: Record<string, Scene> = {
     id: 'final_battle',
     title: 'COMBAT FINAL',
     atmosphere: 'chaos',
+    bgm: 'battle',
     isBattle: true,
     dialogues: [
       { speaker: 'narrator', text: "⚔️ LE COMBAT FINAL COMMENCE ⚔️" },
@@ -159,6 +166,7 @@ export const SCENES: Record<string, Scene> = {
     id: 'victory',
     title: 'Epilogue - Un Nouveau Monde',
     atmosphere: 'victory',
+    bgm: 'victory',
     dialogues: [
       { speaker: 'narrator', text: "Le silence. Puis, un redemarrage mondial." },
       { speaker: 'narrator', text: "Pour la premiere fois depuis des decennies, chaque ecran affiche :" },

@@ -8,6 +8,7 @@ import {
   useHealth,
   useGameActions
 } from '../../stores/gameStore';
+import { useSceneBGM } from '../../hooks/useAudio';
 import { SceneBackground } from './SceneBackground';
 import { GameHeader } from './GameHeader';
 import { DialogueBox } from './DialogueBox';
@@ -25,6 +26,9 @@ const VisualNovel = memo(() => {
   const path = usePath();
   const health = useHealth();
   const { nextDialogue, makeChoice, processBattlePhase, completeBattle } = useGameActions();
+
+  // Play BGM when scene changes
+  useSceneBGM(scene?.bgm);
 
   if (!scene) return null;
 

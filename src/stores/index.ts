@@ -10,3 +10,4 @@ export {
   useGameActions,
 } from './gameStore';
 export { useSettingsStore } from './settingsStore';
+export { useAudioStore, useIsMuted, useIsPlaying, useCurrentBGM } from './audioStore';
