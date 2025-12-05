@@ -1,4 +1,4 @@
-import { memo, useEffect, useState, useCallback } from 'react';
+import { memo, useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { BATTLE_ATTACKS, type BattleAttack } from '../../data/scenes';
 import { HealthBar } from './HealthBar';
@@ -63,28 +63,35 @@ const VictoryBanner = memo(() => (
 VictoryBanner.displayName = 'VictoryBanner';
 
 export const BattleScene = memo(({ health, onProcessPhase, onVictory }: BattleSceneProps) => {
-  const [phase, setPhase] = useState(0);
+  const phaseRef = useRef(0);
+  const [displayPhase, setDisplayPhase] = useState(0);
   const [currentAttack, setCurrentAttack] = useState<BattleAttack | null>(null);
   const [isVictory, setIsVictory] = useState(false);
 
-  const processNextPhase = useCallback(() => {
-    if (phase >= BATTLE_ATTACKS.length) {
-      setIsVictory(true);
-      setTimeout(onVictory, 2000);
-      return;
-    }
-
-    const result = onProcessPhase();
-    if (result.attack) {
-      setCurrentAttack(result.attack);
-    }
-    setPhase((p) => p + 1);
-  }, [phase, onProcessPhase, onVictory]);
-
   useEffect(() => {
-    const timer = setTimeout(processNextPhase, 1500);
-    return () => clearTimeout(timer);
-  }, [phase, processNextPhase]);
+    // Reset on mount
+    phaseRef.current = 0;
+    setDisplayPhase(0);
+    setIsVictory(false);
+    setCurrentAttack(null);
+
+    const timer = setInterval(() => {
+      if (phaseRef.current < BATTLE_ATTACKS.length) {
+        const result = onProcessPhase();
+        if (result.attack) {
+          setCurrentAttack(result.attack);
+        }
+        phaseRef.current += 1;
+        setDisplayPhase(phaseRef.current);
+      } else {
+        clearInterval(timer);
+        setIsVictory(true);
+        setTimeout(onVictory, 2000);
+      }
+    }, 1500);
+
+    return () => clearInterval(timer);
+  }, [onProcessPhase, onVictory]);
 
   return (
     <motion.div
@@ -123,7 +130,7 @@ export const BattleScene = memo(({ health, onProcessPhase, onVictory }: BattleSc
       <div className="h-40 flex items-center justify-center">
         <AnimatePresence mode="wait">
           {currentAttack && !isVictory && (
-            <AttackDisplay key={phase} attack={currentAttack} />
+            <AttackDisplay key={displayPhase} attack={currentAttack} />
           )}
           {isVictory && <VictoryBanner key="victory" />}
         </AnimatePresence>
@@ -131,7 +138,7 @@ export const BattleScene = memo(({ health, onProcessPhase, onVictory }: BattleSc
 
       {/* Progress */}
       <div className="text-gray-500 text-sm">
-        Phase {Math.min(phase, BATTLE_ATTACKS.length)} / {BATTLE_ATTACKS.length}
+        Phase {Math.min(displayPhase, BATTLE_ATTACKS.length)} / {BATTLE_ATTACKS.length}
       </div>
     </motion.div>
   );
