@@ -49,14 +49,16 @@ const AI_CONFIG = {
 
 const HIT_SOUNDS = ['ドォーン!', 'ゴッ!', 'バキッ!', 'ドゴォ!', 'ガシッ!', 'ズドン!'];
 
+const BASE = import.meta.env.BASE_URL;
+
 const backgroundConfig = {
-  backgroundURL: '/fond.png',
+  backgroundURL: `${BASE}fond.png`,
   fallbackColor: 0x1a1a2e
 };
 
 const modelPaths = {
-  linux: '/white_mesh.obj',
-  windows: '/win_mesh.obj'
+  linux: `${BASE}white_mesh.obj`,
+  windows: `${BASE}win_mesh.obj`
 };
 
 export const BattleScene = memo(({ onVictory, onDefeat }: BattleSceneProps) => {
@@ -891,7 +893,7 @@ export const BattleScene = memo(({ onVictory, onDefeat }: BattleSceneProps) => {
       <div id="game-container" ref={containerRef}>
         <div className="health-bar-container">
           <div className="character-portrait p1-portrait">
-            <img src="/linux-2048-2401704126.png" alt="Linux" />
+            <img src={`${BASE}linux-2048-2401704126.png`} alt="Linux" />
           </div>
           <div id="player1-health" className="health-bar">
             <div id="player1-fill" className="health-bar-fill" ref={p1FillRef} style={{ width: '100%' }} />
@@ -903,7 +905,7 @@ export const BattleScene = memo(({ onVictory, onDefeat }: BattleSceneProps) => {
             <div id="player2-fill" className="health-bar-fill" ref={p2FillRef} style={{ width: '100%' }} />
           </div>
           <div className="character-portrait p2-portrait">
-            <img src="/Windows-Logo-2342610881.png" alt="Windows" />
+            <img src={`${BASE}Windows-Logo-2342610881.png`} alt="Windows" />
           </div>
         </div>
 

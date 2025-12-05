@@ -2,6 +2,8 @@ import { memo } from 'react';
 import { motion } from 'motion/react';
 import type { Atmosphere } from '../../data/scenes';
 
+const BASE = import.meta.env.BASE_URL;
+
 interface SceneBackgroundProps {
     atmosphere: Atmosphere;
     customBg?: string;
@@ -32,7 +34,7 @@ export const SceneBackground = memo(({ atmosphere, customBg, enableSelection = f
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5 }}
                 className={`absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat ${bgColors[atmosphere]}`}
-                style={{ backgroundImage: `url('${customBg}')` }}
+                style={{ backgroundImage: `url('${customBg.startsWith('/') ? BASE + customBg.slice(1) : customBg}')` }}
             >
                 <div className="absolute inset-0 bg-black/40" />
             </motion.div>
@@ -60,7 +62,7 @@ export const SceneBackground = memo(({ atmosphere, customBg, enableSelection = f
             <div
                 onClick={(e) => { e.stopPropagation(); onChoose?.('linux'); }}
                 className={`relative w-1/2 h-full bg-green-900 bg-cover bg-center border-r border-black/50 ${enableSelection ? 'cursor-pointer hover:brightness-110' : ''}`}
-                style={{ backgroundImage: "url('/backgrounds/linux.png')" }}
+                style={{ backgroundImage: `url('${BASE}backgrounds/linux.png')` }}
             >
                 {enableSelection && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 hover:opacity-100 transition-opacity">
@@ -72,7 +74,7 @@ export const SceneBackground = memo(({ atmosphere, customBg, enableSelection = f
             <div
                 onClick={(e) => { e.stopPropagation(); onChoose?.('windows'); }}
                 className={`relative w-1/2 h-full bg-blue-900 bg-cover bg-center border-l border-black/50 ${enableSelection ? 'cursor-pointer hover:brightness-110' : ''}`}
-                style={{ backgroundImage: "url('/backgrounds/windows.png')" }}
+                style={{ backgroundImage: `url('${BASE}backgrounds/windows.png')` }}
             >
                 {enableSelection && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 hover:opacity-100 transition-opacity">
