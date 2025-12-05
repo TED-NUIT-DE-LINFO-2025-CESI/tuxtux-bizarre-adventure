@@ -61,27 +61,29 @@ export const SCENES: Record<string, Scene> = {
     },
 
     // --- BRANCHE WINDOWS ---
+
+    // --- BRANCHE WINDOWS (SATIRE COMPLÈTE) ---
     scene_2_updates: {
         id: 'scene_2_updates',
-        title: 'Scène 2 : Patience',
+        title: 'Scène 2 : La Fausse Promesse',
         atmosphere: 'windows',
         dialogues: [
-            { speaker: 'player', text: "Je reste sur du classique pour mes jeux.", position: 'center' },
-            { speaker: 'narrator', text: "[ECRAN] Juste un instant... (30 min plus tard) ... Mise à jour 1 sur 48." },
+            { speaker: 'player', text: "Je reste sur du classique. Pour mes jeux, c'est mieux.", position: 'center' },
+            { speaker: 'narrator', text: "[ECRAN] Un instant... (20 min plus tard) ... Mise à jour 1 sur 48." },
             { speaker: 'player', text: "Pardon ?! Il est neuf ! *Le ventilateur décolle*", position: 'left' },
-            { speaker: 'player', text: "Ok Alex, reste calme. Va te faire un café.", position: 'left' },
+            { speaker: 'player', text: "Ok... Va te faire un café Alex. Ça va aller vite...", position: 'left' },
         ],
         nextScene: 'scene_3_account'
     },
 
     scene_3_account: {
         id: 'scene_3_account',
-        title: 'Scène 3 : Connexion Forcée',
+        title: 'Scène 3 : Le Chantage',
         atmosphere: 'windows',
         dialogues: [
-            { speaker: 'clippy', text: "Coucou ! Pour commencer, donnez-moi votre email, téléphone et groupe sanguin.", position: 'right' },
-            { speaker: 'player', text: "Non, je veux un compte local 'Moi'.", position: 'left' },
-            { speaker: 'clippy', text: "Impossible avec le Wi-Fi actif. C'est pour votre bien (et nos pubs).", position: 'right' },
+            { speaker: 'clippy', text: "Coucou ! Pour commencer, donnez-moi votre email, téléphone et nom de jeune fille de votre mère.", position: 'right' },
+            { speaker: 'player', text: "Non, je veux un compte local. Juste 'Moi'.", position: 'left' },
+            { speaker: 'clippy', text: "Ah, vous avez le Wi-Fi actif ! Du coup, le compte local est interdit. C'est pour votre bien.", position: 'right' },
             { speaker: 'player', text: "Tu me forces ? Sérieusement ?", position: 'left' },
         ],
         choices: [
@@ -100,20 +102,21 @@ export const SCENES: Record<string, Scene> = {
         atmosphere: 'windows',
         dialogues: [
             { speaker: 'clippy', text: "Configurons la vie privée ! J'ai tout coché 'OUI' par défaut car je vous aime.", position: 'right' },
-            { speaker: 'player', text: "Géolocalisation ? Historique de frappe ? Hors de question ! *Décoche tout*", position: 'left' },
-            { speaker: 'clippy', text: "Vous n'aimez pas les pubs ciblées ? Dommage. Cliquez sur 'Accepter' quand même.", position: 'right' },
+            { speaker: 'narrator', text: "[OPTION] Envoyer ma position précise à 400 partenaires." },
+            { speaker: 'player', text: "Hors de question ! *Clic frénétique pour tout décocher*", position: 'left' },
+            { speaker: 'clippy', text: "Vous n'aimez pas les pubs pertinentes ? Dommage. Cliquez sur 'Accepter' quand même.", position: 'right' },
         ],
         nextScene: 'scene_5_eula'
     },
 
     scene_5_eula: {
         id: 'scene_5_eula',
-        title: 'Scène 5 : Lecture Rapide',
+        title: 'Scène 5 : Le Mur de Texte',
         atmosphere: 'windows',
         dialogues: [
-            { speaker: 'clippy', text: "Lisez les 45 000 mots des CGU. Clause 14B : don d'organes numériques.", position: 'right' },
-            { speaker: 'narrator', text: "*BIP ERREUR* Vous n'avez pas lu ! Le bouton est grisé." },
-            { speaker: 'clippy', text: "Je le sais. Scrollez jusqu'au dernier pixel.", position: 'right' },
+            { speaker: 'clippy', text: "Maintenant, lisez les 45 000 mots des CGU. Surtout la clause sur le don d'organes numériques.", position: 'right' },
+            { speaker: 'narrator', text: "*BIP ERREUR* Le bouton 'Accepter' reste grisé." },
+            { speaker: 'clippy', text: "Je sais que vous n'avez pas lu. Scrollez jusqu'au dernier pixel.", position: 'right' },
             { speaker: 'player', text: "C'est du délire... *Scrolle furieusement pendant 15 secondes*", position: 'left' },
         ],
         nextScene: 'scene_6_activation'
@@ -124,9 +127,9 @@ export const SCENES: Record<string, Scene> = {
         title: 'Scène 6 : Le Péage',
         atmosphere: 'windows',
         dialogues: [
-            { speaker: 'clippy', text: "Ordi configuré ! Entrez votre clé produit de 25 caractères.", position: 'right' },
+            { speaker: 'clippy', text: "Ordi configuré ! Il manque juste la clé produit de 25 caractères.", position: 'right' },
             { speaker: 'player', text: "Je l'ai payé ! Il n'y avait rien dans la boîte !", position: 'left' },
-            { speaker: 'clippy', text: "Aïe. Pas de licence ? Ce sera le mode 'Pauvre' avec filigrane.", position: 'right' },
+            { speaker: 'clippy', text: "Vous avez payé le matériel. Le Logiciel est un privilège. Pas de clé = Mode Pauvre.", position: 'right' },
         ],
         choices: [
             {
@@ -139,20 +142,20 @@ export const SCENES: Record<string, Scene> = {
                 id: 2,
                 text: 'Payer 145€ (Aïe)',
                 nextScene: 'scene_7_desktop',
-                consequence: 'Portefeuille vide.'
+                consequence: 'Votre carte bleue pleure.'
             }
         ]
     },
 
     scene_7_desktop: {
         id: 'scene_7_desktop',
-        title: 'Scène 7 : Le Bureau',
+        title: 'Scène 7 : Le Bureau de l\'Enfer',
         atmosphere: 'chaos',
         dialogues: [
-            { speaker: 'narrator', text: "Bureau noir. Filigrane 'ACTIVER WINDOWS'. Soudain : *DING! POP! DING!*" },
+            { speaker: 'narrator', text: "Le bureau s'affiche. Fond noir. Filigrane 'ACTIVER WINDOWS'. Soudain : *DING! POP! DING!*" },
             { speaker: 'narrator', text: "[POPUP] ANTIVIRUS PÉRIMÉ ! OFFICE 365 ! CANDY CRUSH SAGA !" },
             { speaker: 'player', text: "Arrêtez ! Je veux juste Firefox...", position: 'left' },
-            { speaker: 'clippy', text: "ATTENDEZ ! EDGE EST 400% PLUS RAPIDE ! (Vraiment, croyez-nous)", position: 'right' },
+            { speaker: 'clippy', text: "ATTENDEZ ! EDGE EST 400% PLUS RAPIDE ! (Vraiment !)", position: 'right' },
         ],
         choices: [
             {
@@ -179,17 +182,17 @@ export const SCENES: Record<string, Scene> = {
 
     scene_9_keynote: {
         id: 'scene_9_keynote',
-        title: 'Scène 9 : La Transition',
+        title: 'Scène 9 : La Grande Transition',
         atmosphere: 'chaos',
         dialogues: [
-            { speaker: 'narrator', text: "Écran géant. Bill Gates apparaît : 'Vos PC sont lents ? C'est votre faute.'" },
-            { speaker: 'gates', text: "J'annonce la Grande Transition. Les vieux systèmes seront effacés ce soir.", position: 'center' },
-            { speaker: 'player', text: "Effacés ?! C'est du terrorisme !", position: 'left' },
-            { speaker: 'narrator', text: "Bill mute en WINDOWS BLEU GÉANT. *CRASH!* Tux déchire l'écran !" },
+            { speaker: 'gates', text: "Vos PC sont lents ? C'est de votre faute. Vous êtes dépassés.", position: 'center' },
+            { speaker: 'gates', text: "J'annonce la Grande Transition. Tous les vieux systèmes seront effacés ce soir.", position: 'center' },
+            { speaker: 'narrator', text: "Bill se transforme en WINDOWS BLEU GÉANT. *CRASH!* Tux déchire l'écran !" },
             { speaker: 'tux', text: "🐧 Besoin d'un root access ?", position: 'right' },
         ],
         nextScene: 'final_battle'
     },
+
 
     // --- BRANCHE LINUX ---
     linux_install: {
