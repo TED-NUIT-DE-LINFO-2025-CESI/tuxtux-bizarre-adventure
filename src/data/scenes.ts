@@ -67,7 +67,7 @@ export const SCENES: Record<string, Scene> = {
         id: 'scene_2_updates',
         title: 'Scène 2 : Patience',
         atmosphere: 'windows',
-        bgImage: '/backgrounds/windows-update.jpg', // Vérifie que cette image existe !
+        bgImage: '/backgrounds/maj.png', // Vérifie que cette image existe !
         dialogues: [
             { speaker: 'player', text: "Je reste sur du classique pour mes jeux.", position: 'center' },
             { speaker: 'narrator', text: "[ECRAN] Juste un instant... (30 min plus tard) ... Mise à jour 1 sur 48." },
@@ -80,7 +80,7 @@ export const SCENES: Record<string, Scene> = {
         id: 'scene_3_account',
         title: 'Scène 3 : Connexion Forcée',
         atmosphere: 'windows',
-        bgImage: '/backgrounds/windows-desktop.jpg',
+        bgImage: '/backgrounds/start.png',
         dialogues: [
             { speaker: 'clippy', text: "Coucou ! Pour commencer, donnez-moi votre email, téléphone et groupe sanguin.", position: 'right' },
             { speaker: 'player', text: "Non, je veux un compte local 'Moi'.", position: 'left' },
@@ -100,7 +100,7 @@ export const SCENES: Record<string, Scene> = {
         id: 'scene_4_privacy',
         title: 'Scène 4 : Vie Privée',
         atmosphere: 'windows',
-        bgImage: '/backgrounds/windows-settings.jpg',
+        bgImage: '/backgrounds/start.png',
         dialogues: [
             { speaker: 'clippy', text: "J'ai tout coché 'OUI' par défaut car je vous aime.", position: 'right' },
             { speaker: 'player', text: "Géolocalisation ? Historique de frappe ? Hors de question !", position: 'left' },
@@ -124,7 +124,7 @@ export const SCENES: Record<string, Scene> = {
         id: 'scene_6_activation',
         title: 'Scène 6 : Activation',
         atmosphere: 'windows',
-        bgImage: '/backgrounds/windows-key.jpg',
+        bgImage: '/backgrounds/activation.png',
         dialogues: [
             { speaker: 'clippy', text: "Entrez votre clé produit.", position: 'right' },
             { speaker: 'player', text: "Je l'ai payé ! Il n'y avait rien dans la boîte !", position: 'left' },
@@ -143,7 +143,7 @@ export const SCENES: Record<string, Scene> = {
         id: 'scene_7_desktop',
         title: 'Scène 7 : Le Bureau',
         atmosphere: 'chaos',
-        bgImage: '/backgrounds/windows-glitch.jpg',
+        bgImage: '/backgrounds/popup.png',
         dialogues: [
             { speaker: 'narrator', text: "[POPUP] ANTIVIRUS PÉRIMÉ ! OFFICE 365 ! CANDY CRUSH SAGA !" },
             { speaker: 'player', text: "Arrêtez ! Je veux juste Firefox...", position: 'left' },
@@ -162,7 +162,7 @@ export const SCENES: Record<string, Scene> = {
         id: 'scene_8_obsolescence',
         title: 'Scène 8 : Trop Vieux',
         atmosphere: 'chaos',
-        bgImage: '/backgrounds/bsod.jpg',
+        bgImage: '/backgrounds/dic.png',
         dialogues: [
             { speaker: 'clippy', text: "Oups. Votre processeur est obsolète pour Windows 11.", position: 'right' },
             { speaker: 'player', text: "Je l'ai acheté ce matin !!!", position: 'left' },
@@ -187,7 +187,7 @@ export const SCENES: Record<string, Scene> = {
         id: 'linux_install',
         title: 'Branche Linux - Matrix',
         atmosphere: 'linux',
-        bgImage: '/backgrounds/linux-install.jpg',
+        bgImage: '/backgrounds/start-li.png',
         dialogues: [
             { speaker: 'narrator', text: "Clic sur le Pingouin. Écran noir... Texte blanc défile." },
             { speaker: 'tux', text: "Installation terminée. Bienvenue.", position: 'right' },
@@ -199,7 +199,7 @@ export const SCENES: Record<string, Scene> = {
         id: 'linux_terminal',
         title: 'Branche Linux - Terminal',
         atmosphere: 'linux',
-        bgImage: '/backgrounds/terminal.jpg',
+        bgImage: '/backgrounds/linux-p.png',
         dialogues: [
             { speaker: 'linus', text: "Ici on utilise le TERMINAL. La puissance pure.", position: 'right' },
         ],
@@ -223,7 +223,7 @@ export const SCENES: Record<string, Scene> = {
         id: 'linux_gui',
         title: 'Logithèque',
         atmosphere: 'linux',
-        bgImage: '/backgrounds/store.jpg',
+        bgImage: '/backgrounds/linux-p.png',
         dialogues: [
             { speaker: 'narrator', text: "Tout est gratuit, validé, sécurisé." },
             { speaker: 'player', text: "Je vais pleurer de joie.", position: 'left' },
@@ -235,7 +235,7 @@ export const SCENES: Record<string, Scene> = {
         id: 'linux_power',
         title: 'Sudo Power',
         atmosphere: 'linux',
-        bgImage: '/backgrounds/matrix.jpg',
+        bgImage: '/backgrounds/linux-p.png',
         dialogues: [
             { speaker: 'player', text: "$ sudo apt install steam -y", position: 'center' },
             { speaker: 'linus', text: "Bien joué.", position: 'right' },
@@ -247,7 +247,7 @@ export const SCENES: Record<string, Scene> = {
         id: 'linux_alert',
         title: 'Appel aux armes',
         atmosphere: 'chaos',
-        bgImage: '/backgrounds/alert.jpg',
+        bgImage: '/backgrounds/alert.png',
         dialogues: [
             { speaker: 'tux', text: "ALERTE ! Bill Gates efface les vieux PC !", position: 'right' },
             { speaker: 'linus', text: "Prends cette Clé USB. Formate le Mal.", position: 'right' },
