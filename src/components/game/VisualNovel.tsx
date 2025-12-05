@@ -6,7 +6,6 @@ import {
     useShowChoices,
     useShowBattle,
     usePath,
-    useHealth,
     useGameActions
 } from '../../stores/gameStore';
 import { SceneBackground } from './SceneBackground';
@@ -20,8 +19,7 @@ const VisualNovel = memo(() => {
     const showChoices = useShowChoices();
     const showBattle = useShowBattle();
     const path = usePath();
-    const health = useHealth();
-    const { nextDialogue, makeChoice, processBattlePhase, completeBattle } = useGameActions();
+    const { nextDialogue, makeChoice, completeBattle } = useGameActions();
 
     // --- ZONE DE DEBUG D'ERREUR ---
     if (!scene) {
@@ -101,16 +99,14 @@ const VisualNovel = memo(() => {
                                     )}
                                 </div>
                             )}
-
-                            {/* 3. COMBAT */}
-                            {showBattle && (
-                                <BattleScene
-                                    health={health}
-                                    onProcessPhase={processBattlePhase}
-                                    onVictory={completeBattle}
-                                />
-                            )}
                         </AnimatePresence>
+
+                        {/* 3. COMBAT */}
+                        {showBattle && (
+                            <BattleScene
+                                onVictory={completeBattle}
+                            />
+                        )}
                     </div>
                 </main>
 

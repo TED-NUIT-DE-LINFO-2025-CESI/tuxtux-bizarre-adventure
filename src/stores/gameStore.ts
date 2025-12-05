@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import { SCENES, BATTLE_ATTACKS, type BattleAttack } from '../data/scenes';
+import { SCENES } from '../data/scenes';
 
 // --- TYPES ---
 
@@ -10,17 +10,11 @@ interface GameState {
     showChoices: boolean;
     showBattle: boolean;
     path: 'windows' | 'linux' | null;
-    health: {
-        tux: number;
-        omega: number;
-    };
-    battlePhase: number;
 }
 
 interface GameActions {
     nextDialogue: () => void;
     makeChoice: (choiceId: number) => void;
-    processBattlePhase: () => { isComplete: boolean; attack?: BattleAttack; newHealth?: { tux: number; omega: number } };
     completeBattle: () => void;
     resetGame: () => void;
 }
@@ -34,9 +28,7 @@ const INITIAL_STATE: GameState = {
     dialogueIndex: 0,
     showChoices: false,
     showBattle: false,
-    path: null,
-    health: { tux: 100, omega: 100 },
-    battlePhase: 0,
+    path: null
 };
 
 const useGameStore = create<GameStore>()(
@@ -54,7 +46,7 @@ const useGameStore = create<GameStore>()(
 
                         // Si c'est un combat, on ne gère pas les dialogues classiques
                         if (scene.isBattle) {
-                            set({ showBattle: true });
+                            set({ showBattle: true, dialogueIndex: 0, showChoices: false });
                             return;
                         }
 
@@ -103,35 +95,6 @@ const useGameStore = create<GameStore>()(
                         }
                     },
 
-                    processBattlePhase: () => {
-                        const state = get();
-                        const attackIndex = state.battlePhase;
-
-                        if (attackIndex >= BATTLE_ATTACKS.length) {
-                            return { isComplete: true };
-                        }
-
-                        const attack = BATTLE_ATTACKS[attackIndex];
-                        const newHealth = { ...state.health };
-
-                        // Application des dégâts
-                        if (attack.type === 'tux') {
-                            newHealth.omega = Math.max(0, newHealth.omega - attack.damage);
-                            if (attack.heal) {
-                                newHealth.tux = Math.min(100, newHealth.tux + attack.heal);
-                            }
-                        } else {
-                            newHealth.tux = Math.max(0, newHealth.tux - attack.damage);
-                        }
-
-                        set({
-                            health: newHealth,
-                            battlePhase: state.battlePhase + 1
-                        });
-
-                        return { isComplete: false, attack, newHealth };
-                    },
-
                     completeBattle: () => {
                         const state = get();
                         const scene = SCENES[state.currentSceneId];
@@ -142,6 +105,8 @@ const useGameStore = create<GameStore>()(
                                 showBattle: false,
                                 showChoices: false
                             });
+                        } else {
+                            set({ showBattle: false });
                         }
                     },
 
@@ -164,5 +129,4 @@ export const useDialogueIndex = () => useGameStore((state) => state.dialogueInde
 export const useShowChoices = () => useGameStore((state) => state.showChoices);
 export const useShowBattle = () => useGameStore((state) => state.showBattle);
 export const usePath = () => useGameStore((state) => state.path);
-export const useHealth = () => useGameStore((state) => state.health);
 export const useGameActions = () => useGameStore((state) => state.actions);
