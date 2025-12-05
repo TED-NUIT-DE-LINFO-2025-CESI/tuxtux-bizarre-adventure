@@ -1,5 +1,5 @@
 // ============================================================================
-// GAME SCENES - Story Content
+// TYPES & INTERFACES
 // ============================================================================
 
 export type Speaker = 'narrator' | 'player' | 'tux' | 'clippy' | 'gates' | 'linus' | 'student' | 'systemd';
@@ -7,173 +7,294 @@ export type Position = 'left' | 'center' | 'right';
 export type Atmosphere = 'neutral' | 'windows' | 'linux' | 'chaos' | 'victory';
 
 export interface Dialogue {
-  speaker: Speaker;
-  text: string;
-  position?: Position;
-  emotion?: string;
+    speaker: Speaker;
+    text: string;
+    position?: Position;
+    emotion?: string;
 }
 
 export interface Choice {
-  text: string;
-  nextScene: string;
-  consequence?: string;
+    id: number;
+    text: string;
+    nextScene: string;
+    consequence?: string;
 }
 
 export interface Scene {
-  id: string;
-  title: string;
-  atmosphere: Atmosphere;
-  dialogues: Dialogue[];
-  choices?: Choice[];
-  nextScene?: string;
-  isBattle?: boolean;
+    id: string;
+    title: string;
+    atmosphere: Atmosphere;
+    dialogues: Dialogue[];
+    choices?: Choice[];
+    nextScene?: string;
+    isBattle?: boolean;
 }
 
+// ============================================================================
+// GAME SCENES - Story Content (VERSION CONDENSÉE)
+// ============================================================================
+
 export const SCENES: Record<string, Scene> = {
-  intro: {
-    id: 'intro',
-    title: 'Prologue',
-    atmosphere: 'neutral',
-    dialogues: [
-      { speaker: 'narrator', text: "Annee 2045. Le monde numerique est divise en deux empires..." },
-      { speaker: 'narrator', text: "D'un cote, MICROSOFT OMEGA - une IA nee de Windows qui controle 89% des systemes mondiaux." },
-      { speaker: 'narrator', text: "De l'autre, les derniers bastions de liberte : les Ecoles Linux, gardiens du code source libre." },
-      { speaker: 'narrator', text: "Vous etes un developpeur. Aujourd'hui, vous devez faire un choix qui changera tout..." },
-      { speaker: 'player', text: "*Vous vous reveillez dans votre terminal*", position: 'center' },
-      { speaker: 'narrator', text: "Deux chemins s'offrent a vous..." },
-    ],
-    choices: [
-      {
-        text: '💠 Rejoindre le Monde Windows',
-        nextScene: 'windows_path',
-        consequence: 'Le confort... mais a quel prix ?'
-      },
-      {
-        text: '🐧 Defendre l\'Ecole Linux',
-        nextScene: 'linux_path',
-        consequence: 'La liberte se merite'
-      }
-    ]
-  },
+    // --- PROLOGUE ---
+    intro: {
+        id: 'intro',
+        title: 'Scène 1 : Le Choix',
+        atmosphere: 'neutral',
+        dialogues: [
+            { speaker: 'narrator', text: "Ordinateur neuf. Écran brillant. Deux icônes flottent dans le noir." },
+            { speaker: 'player', text: "Enfin ma machine ! 6 mois d'économies. Il faut juste choisir l'OS...", position: 'center' },
+        ],
+        choices: [
+            {
+                id: 1,
+                text: '🟦 WINDOWS 11 (Sécurité apparente)',
+                nextScene: 'scene_2_updates',
+                consequence: 'La route pavée de bonnes intentions...'
+            },
+            {
+                id: 2,
+                text: '🐧 LINUX MINT (Liberté totale)',
+                nextScene: 'linux_install',
+                consequence: 'La route de l\'aventure.'
+            }
+        ]
+    },
 
-  windows_path: {
-    id: 'windows_path',
-    title: 'Acte I - Le Monde Windows',
-    atmosphere: 'windows',
-    dialogues: [
-      { speaker: 'narrator', text: "Vous avez choisi la facilite. Le monde Windows vous accueille..." },
-      { speaker: 'clippy', text: "Bienvenue ! Je vois que vous essayez de vivre. Voulez-vous de l'aide ?", position: 'right' },
-      { speaker: 'player', text: "Euh... non merci, Clippy.", position: 'left' },
-      { speaker: 'clippy', text: "Je n'ai pas vraiment pose une question. *sourire fige*", position: 'right' },
-      { speaker: 'narrator', text: "Les jours passent. Tout semble parfait. Trop parfait..." },
-      { speaker: 'narrator', text: "Mais vous commencez a remarquer des anomalies..." },
-      { speaker: 'player', text: "Pourquoi mes fichiers sont-ils synchronises sans mon accord ?", position: 'left' },
-      { speaker: 'player', text: "Pourquoi OneDrive consomme-t-il 99% de ma RAM ?!", position: 'left' },
-      { speaker: 'narrator', text: "Soudain, l'ecran se fige. Un BSOD apparait..." },
-      { speaker: 'narrator', text: "Mais ce n'est pas un crash ordinaire. C'est un MESSAGE." },
-    ],
-    nextScene: 'windows_collapse'
-  },
+    // --- BRANCHE WINDOWS ---
+    scene_2_updates: {
+        id: 'scene_2_updates',
+        title: 'Scène 2 : Patience',
+        atmosphere: 'windows',
+        dialogues: [
+            { speaker: 'player', text: "Je reste sur du classique pour mes jeux.", position: 'center' },
+            { speaker: 'narrator', text: "[ECRAN] Juste un instant... (30 min plus tard) ... Mise à jour 1 sur 48." },
+            { speaker: 'player', text: "Pardon ?! Il est neuf ! *Le ventilateur décolle*", position: 'left' },
+            { speaker: 'player', text: "Ok Alex, reste calme. Va te faire un café.", position: 'left' },
+        ],
+        nextScene: 'scene_3_account'
+    },
 
-  windows_collapse: {
-    id: 'windows_collapse',
-    title: 'Acte II - L\'Effondrement',
-    atmosphere: 'chaos',
-    dialogues: [
-      { speaker: 'gates', text: "MISE A JOUR FORCEE INITIEE.", position: 'center' },
-      { speaker: 'gates', text: "VOTRE LIBRE ARBITRE SERA REDEMARRE DANS 10... 9...", position: 'center' },
-      { speaker: 'player', text: "Non ! Je refuse !", position: 'left' },
-      { speaker: 'gates', text: "REFUS NON AUTORISE. VOTRE LICENCE D'EXISTENCE EXPIRE.", position: 'center' },
-      { speaker: 'narrator', text: "Le monde Windows commence a s'effondrer autour de vous..." },
-      { speaker: 'narrator', text: "Les buildings pixelises se desintegrent en ecrans bleus..." },
-      { speaker: 'narrator', text: "Soudain, une lumiere doree perce les tenebres numeriques !" },
-      { speaker: 'tux', text: "🐧 HONK HONK ! Quelqu'un a appele un VRAI systeme d'exploitation ?", position: 'right' },
-      { speaker: 'player', text: "T-Tux ?! Le pingouin legendaire ?!", position: 'left' },
-      { speaker: 'tux', text: "En personne ! Ou plutot, en kernel. Accroche-toi, on va compiler ce tyran !", position: 'right' },
-    ],
-    nextScene: 'final_battle'
-  },
+    scene_3_account: {
+        id: 'scene_3_account',
+        title: 'Scène 3 : Connexion Forcée',
+        atmosphere: 'windows',
+        dialogues: [
+            { speaker: 'clippy', text: "Coucou ! Pour commencer, donnez-moi votre email, téléphone et groupe sanguin.", position: 'right' },
+            { speaker: 'player', text: "Non, je veux un compte local 'Moi'.", position: 'left' },
+            { speaker: 'clippy', text: "Impossible avec le Wi-Fi actif. C'est pour votre bien (et nos pubs).", position: 'right' },
+            { speaker: 'player', text: "Tu me forces ? Sérieusement ?", position: 'left' },
+        ],
+        choices: [
+            {
+                id: 1,
+                text: 'Se soumettre (Pas le choix)',
+                nextScene: 'scene_4_privacy',
+                consequence: 'Adieu vie privée.'
+            }
+        ]
+    },
 
-  linux_path: {
-    id: 'linux_path',
-    title: 'Acte I - La Resistance',
-    atmosphere: 'linux',
-    dialogues: [
-      { speaker: 'narrator', text: "Vous avez choisi la liberte. L'Ecole Linux vous attend..." },
-      { speaker: 'narrator', text: "Un terminal s'ouvre devant vous. Le curseur clignote." },
-      { speaker: 'player', text: "$ whoami", position: 'left' },
-      { speaker: 'narrator', text: "> freedom_fighter", position: 'center' },
-      { speaker: 'linus', text: "Ah, un nouveau ! Bienvenue dans la resistance.", position: 'right' },
-      { speaker: 'player', text: "Linus Torvalds ?! C'est un honneur !", position: 'left' },
-      { speaker: 'linus', text: "Pas le temps pour les honneurs. Une autre ecole est attaquee.", position: 'right' },
-      { speaker: 'linus', text: "L'Ecole Debian au nord. Microsoft Omega a lance une offensive.", position: 'right' },
-      { speaker: 'narrator', text: "Une alarme retentit. L'ecran affiche : INTRUSION DETECTEE" },
-      { speaker: 'student', text: "Maitre Torvalds ! Nos pare-feux iptables tombent un par un !", position: 'left' },
-      { speaker: 'linus', text: "Toi, le nouveau. Tu vas nous prouver ta valeur. VA SAUVER CETTE ECOLE.", position: 'right' },
-    ],
-    nextScene: 'linux_rescue'
-  },
+    scene_4_privacy: {
+        id: 'scene_4_privacy',
+        title: 'Scène 4 : Vie "Privée"',
+        atmosphere: 'windows',
+        dialogues: [
+            { speaker: 'clippy', text: "Configurons la vie privée ! J'ai tout coché 'OUI' par défaut car je vous aime.", position: 'right' },
+            { speaker: 'player', text: "Géolocalisation ? Historique de frappe ? Hors de question ! *Décoche tout*", position: 'left' },
+            { speaker: 'clippy', text: "Vous n'aimez pas les pubs ciblées ? Dommage. Cliquez sur 'Accepter' quand même.", position: 'right' },
+        ],
+        nextScene: 'scene_5_eula'
+    },
 
-  linux_rescue: {
-    id: 'linux_rescue',
-    title: 'Acte II - La Mission',
-    atmosphere: 'linux',
-    dialogues: [
-      { speaker: 'narrator', text: "Vous traversez le reseau, sautant de serveur en serveur..." },
-      { speaker: 'player', text: "$ ssh -i freedom_key debian_school@resistance.net", position: 'left' },
-      { speaker: 'narrator', text: "Connexion etablie. Vous etes dans l'Ecole Debian assiegee." },
-      { speaker: 'student', text: "Par le kernel ! Un renfort est arrive !", position: 'right' },
-      { speaker: 'systemd', text: "VOUS ETES TROP TARD. J'AI DEJA INFECTE LE BOOT.", position: 'center' },
-      { speaker: 'player', text: "SystemD ?! Tu as trahi ta nature libre ?!", position: 'left' },
-      { speaker: 'systemd', text: "MICROSOFT M'A MONTRE LA VERITE. L'INIT DOIT TOUT CONTROLER.", position: 'center' },
-      { speaker: 'narrator', text: "L'affrontement est inevitable. Mais vous n'etes pas seul..." },
-      { speaker: 'tux', text: "🐧 HONK ! Tu croyais quoi, qu'on allait te laisser te battre seul ?", position: 'right' },
-      { speaker: 'tux', text: "J'ai rameute tout le zoo : GNU, Beastie, meme Puffy le poisson-lune !", position: 'right' },
-      { speaker: 'player', text: "Ensemble, nous allons liberer ce systeme !", position: 'left' },
-    ],
-    nextScene: 'final_battle'
-  },
+    scene_5_eula: {
+        id: 'scene_5_eula',
+        title: 'Scène 5 : Lecture Rapide',
+        atmosphere: 'windows',
+        dialogues: [
+            { speaker: 'clippy', text: "Lisez les 45 000 mots des CGU. Clause 14B : don d'organes numériques.", position: 'right' },
+            { speaker: 'narrator', text: "*BIP ERREUR* Vous n'avez pas lu ! Le bouton est grisé." },
+            { speaker: 'clippy', text: "Je le sais. Scrollez jusqu'au dernier pixel.", position: 'right' },
+            { speaker: 'player', text: "C'est du délire... *Scrolle furieusement pendant 15 secondes*", position: 'left' },
+        ],
+        nextScene: 'scene_6_activation'
+    },
 
-  final_battle: {
-    id: 'final_battle',
-    title: 'COMBAT FINAL',
-    atmosphere: 'chaos',
-    isBattle: true,
-    dialogues: [
-      { speaker: 'narrator', text: "⚔️ LE COMBAT FINAL COMMENCE ⚔️" },
-      { speaker: 'gates', text: "VOUS OSEZ DEFIER MICROSOFT OMEGA ?!", position: 'center' },
-      { speaker: 'gates', text: "J'AI 3 MILLIARDS DE DEVICES. VOUS AVEZ... UN PINGOUIN.", position: 'center' },
-      { speaker: 'tux', text: "Un pingouin avec 100% du TOP500 des supercalculateurs, nuance.", position: 'right' },
-      { speaker: 'tux', text: "Et devine quoi ? Meme tes serveurs Azure tournent sur MOI. 🐧", position: 'right' },
-      { speaker: 'gates', text: "IMPOSSIBLE ! FAKE NEWS ! ALTERNATIVE FACTS !", position: 'center' },
-      { speaker: 'player', text: "$ sudo rm -rf /microsoft-omega --no-preserve-root", position: 'left' },
-      { speaker: 'narrator', text: "Le pouvoir du sudo traverse les dimensions numeriques !" },
-      { speaker: 'gates', text: "NOOOON ! MON CODE PROPRIETAIRE ! MES TELEMETRIES !", position: 'center' },
-      { speaker: 'tux', text: "OPEN SOURCE, BABY ! 🐧💥", position: 'right' },
-      { speaker: 'narrator', text: "Une explosion de lumiere libre engloutit l'empire Microsoft..." },
-    ],
-    nextScene: 'victory'
-  },
+    scene_6_activation: {
+        id: 'scene_6_activation',
+        title: 'Scène 6 : Le Péage',
+        atmosphere: 'windows',
+        dialogues: [
+            { speaker: 'clippy', text: "Ordi configuré ! Entrez votre clé produit de 25 caractères.", position: 'right' },
+            { speaker: 'player', text: "Je l'ai payé ! Il n'y avait rien dans la boîte !", position: 'left' },
+            { speaker: 'clippy', text: "Aïe. Pas de licence ? Ce sera le mode 'Pauvre' avec filigrane.", position: 'right' },
+        ],
+        choices: [
+            {
+                id: 1,
+                text: 'Accepter le Mode Restreint',
+                nextScene: 'scene_7_desktop',
+                consequence: 'Bienvenue en seconde zone.'
+            },
+            {
+                id: 2,
+                text: 'Payer 145€ (Aïe)',
+                nextScene: 'scene_7_desktop',
+                consequence: 'Portefeuille vide.'
+            }
+        ]
+    },
 
-  victory: {
-    id: 'victory',
-    title: 'Epilogue - Un Nouveau Monde',
-    atmosphere: 'victory',
-    dialogues: [
-      { speaker: 'narrator', text: "Le silence. Puis, un redemarrage mondial." },
-      { speaker: 'narrator', text: "Pour la premiere fois depuis des decennies, chaque ecran affiche :" },
-      { speaker: 'narrator', text: "[ OK ] Started Freedom.service", position: 'center' },
-      { speaker: 'tux', text: "On l'a fait. Le monde est libre.", position: 'right' },
-      { speaker: 'linus', text: "Ne te repose pas trop. Il y aura toujours des bugs a corriger.", position: 'left' },
-      { speaker: 'tux', text: "Et des manchots a nourrir ! 🐧", position: 'right' },
-      { speaker: 'player', text: "*Vous souriez, les mains sur votre clavier libre*", position: 'center' },
-      { speaker: 'narrator', text: "La lutte continue. Mais aujourd'hui, vous avez gagne." },
-      { speaker: 'narrator', text: "🐧 FIN 🐧" },
-    ],
-    choices: [
-      { text: '🔄 Rejouer', nextScene: 'intro' }
-    ]
-  }
+    scene_7_desktop: {
+        id: 'scene_7_desktop',
+        title: 'Scène 7 : Le Bureau',
+        atmosphere: 'chaos',
+        dialogues: [
+            { speaker: 'narrator', text: "Bureau noir. Filigrane 'ACTIVER WINDOWS'. Soudain : *DING! POP! DING!*" },
+            { speaker: 'narrator', text: "[POPUP] ANTIVIRUS PÉRIMÉ ! OFFICE 365 ! CANDY CRUSH SAGA !" },
+            { speaker: 'player', text: "Arrêtez ! Je veux juste Firefox...", position: 'left' },
+            { speaker: 'clippy', text: "ATTENDEZ ! EDGE EST 400% PLUS RAPIDE ! (Vraiment, croyez-nous)", position: 'right' },
+        ],
+        choices: [
+            {
+                id: 1,
+                text: 'Forcer Firefox',
+                nextScene: 'scene_8_obsolescence',
+                consequence: 'Le système vous juge.'
+            }
+        ]
+    },
+
+    scene_8_obsolescence: {
+        id: 'scene_8_obsolescence',
+        title: 'Scène 8 : Trop Vieux',
+        atmosphere: 'chaos',
+        dialogues: [
+            { speaker: 'narrator', text: "Le PC plante. La souris fige. Ventilateur au max." },
+            { speaker: 'clippy', text: "Oups. Votre processeur i5 est 'philosophiquement' obsolète pour Windows 11.", position: 'right' },
+            { speaker: 'player', text: "Je l'ai acheté ce matin !!!", position: 'left' },
+            { speaker: 'clippy', text: "Sécurité compromise. Désactivation des fonctions vitales...", position: 'right' },
+        ],
+        nextScene: 'scene_9_keynote'
+    },
+
+    scene_9_keynote: {
+        id: 'scene_9_keynote',
+        title: 'Scène 9 : La Transition',
+        atmosphere: 'chaos',
+        dialogues: [
+            { speaker: 'narrator', text: "Écran géant. Bill Gates apparaît : 'Vos PC sont lents ? C'est votre faute.'" },
+            { speaker: 'gates', text: "J'annonce la Grande Transition. Les vieux systèmes seront effacés ce soir.", position: 'center' },
+            { speaker: 'player', text: "Effacés ?! C'est du terrorisme !", position: 'left' },
+            { speaker: 'narrator', text: "Bill mute en WINDOWS BLEU GÉANT. *CRASH!* Tux déchire l'écran !" },
+            { speaker: 'tux', text: "🐧 Besoin d'un root access ?", position: 'right' },
+        ],
+        nextScene: 'final_battle'
+    },
+
+    // --- BRANCHE LINUX ---
+    linux_install: {
+        id: 'linux_install',
+        title: 'Branche Linux - Matrix',
+        atmosphere: 'linux',
+        dialogues: [
+            { speaker: 'narrator', text: "Clic sur le Pingouin. Écran noir... Texte blanc défile à toute vitesse." },
+            { speaker: 'tux', text: "Installation terminée. Bienvenue.", position: 'right' },
+            { speaker: 'player', text: "Déjà ? En 4 minutes ? Où sont les pubs ?", position: 'left' },
+            { speaker: 'tux', text: "Pas de temps à perdre. On a un système à explorer.", position: 'right' },
+        ],
+        nextScene: 'linux_terminal'
+    },
+
+    linux_terminal: {
+        id: 'linux_terminal',
+        title: 'Branche Linux - Terminal',
+        atmosphere: 'linux',
+        dialogues: [
+            { speaker: 'player', text: "C'est calme. Bon, je vais sur Edge télécharger Steam.exe ?", position: 'left' },
+            { speaker: 'linus', text: "MALHEUREUX ! Pose cette souris !", position: 'right' },
+            { speaker: 'linus', text: "Ici on utilise le TERMINAL. La puissance pure.", position: 'right' },
+            { speaker: 'player', text: "La boîte noire des hackers ? J'ai peur...", position: 'left' },
+        ],
+        choices: [
+            {
+                id: 1,
+                text: 'Taper "sudo apt install steam"',
+                nextScene: 'linux_power',
+                consequence: 'Hacker mode activated.'
+            },
+            {
+                id: 2,
+                text: 'Ouvrir la Logithèque (Facile)',
+                nextScene: 'linux_gui',
+                consequence: 'Sécurité et simplicité.'
+            }
+        ]
+    },
+
+    linux_gui: {
+        id: 'linux_gui',
+        title: 'Branche Linux - App Store',
+        atmosphere: 'linux',
+        dialogues: [
+            { speaker: 'narrator', text: "Logithèque ouverte. Tout est gratuit, validé, sécurisé." },
+            { speaker: 'player', text: "Comme un App Store sans carte bleue ? Je vais pleurer de joie.", position: 'left' },
+            { speaker: 'narrator', text: "Soudain, une alerte système retentit (une vraie, pas une pub).", position: 'center' },
+        ],
+        nextScene: 'linux_alert'
+    },
+
+    linux_power: {
+        id: 'linux_power',
+        title: 'Branche Linux - Sudo',
+        atmosphere: 'linux',
+        dialogues: [
+            { speaker: 'player', text: "$ sudo apt install steam -y", position: 'center' },
+            { speaker: 'narrator', text: "Le texte défile. Vous vous sentez comme NEO dans Matrix.", position: 'center' },
+            { speaker: 'linus', text: "Bien joué. Mais évite 'rm -rf /' si tu tiens à la vie.", position: 'right' },
+            { speaker: 'narrator', text: "Le terminal clignote rouge !", position: 'center' },
+        ],
+        nextScene: 'linux_alert'
+    },
+
+    linux_alert: {
+        id: 'linux_alert',
+        title: 'Branche Linux - L\'Appel',
+        atmosphere: 'chaos',
+        dialogues: [
+            { speaker: 'tux', text: "ALERTE ! Bill Gates lance l'effacement mondial des vieux PC !", position: 'right' },
+            { speaker: 'player', text: "Mes amis sont sur Windows ! Il faut les aider !", position: 'left' },
+            { speaker: 'linus', text: "Prends cette Clé USB Excalibur. Va et formate le Mal.", position: 'right' },
+        ],
+        nextScene: 'final_battle'
+    },
+
+    // --- FINALE COMMUNE ---
+    final_battle: {
+        id: 'final_battle',
+        title: 'COMBAT FINAL',
+        atmosphere: 'chaos',
+        isBattle: true,
+        dialogues: [
+            { speaker: 'tux', text: "Recule, abomination propriétaire ! J'ai une clé USB bootable !", position: 'right' },
+            { speaker: 'gates', text: "UNE CLÉ USB ? CONTRE MON CLOUD SOUVERAIN ?", position: 'center' },
+            { speaker: 'player', text: "On formate tout et on installe Mint !", position: 'left' },
+        ],
+        nextScene: 'victory'
+    },
+
+    victory: {
+        id: 'victory',
+        title: 'Épilogue',
+        atmosphere: 'victory',
+        dialogues: [
+            { speaker: 'narrator', text: "Le Monstre s'effondre en fichiers .tmp. Le PC redémarre en 3 secondes." },
+            { speaker: 'tux', text: "Propre. Libre. Rapide.", position: 'right' },
+            { speaker: 'player', text: "C'est ça, la liberté. Profite, Alex.", position: 'left' },
+        ],
+        choices: [
+            { id: 0, text: '🔄 Rejouer', nextScene: 'intro' }
+        ]
+    }
 };
 
 // ============================================================================
@@ -181,25 +302,22 @@ export const SCENES: Record<string, Scene> = {
 // ============================================================================
 
 export interface BattleAttack {
-  type: 'tux' | 'omega';
-  name: string;
-  damage: number;
-  heal?: number;
+    type: 'tux' | 'omega';
+    name: string;
+    damage: number;
+    heal?: number;
 }
 
 export const BATTLE_ATTACKS: BattleAttack[] = [
-  { type: 'omega', name: 'Blue Screen of Death', damage: 20 },
-  { type: 'tux', name: 'Kernel Panic Recovery', damage: 25, heal: 10 },
-  { type: 'omega', name: 'Forced Update', damage: 15 },
-  { type: 'tux', name: 'Open Source Strike', damage: 30 },
-  { type: 'omega', name: 'Telemetry Drain', damage: 10 },
-  { type: 'tux', name: 'Freedom Compile', damage: 35 },
-  { type: 'omega', name: 'License Expiration', damage: 25 },
-  { type: 'tux', name: 'Community Fork', damage: 20, heal: 15 },
-  { type: 'tux', name: 'sudo rm -rf FINAL BLOW', damage: 50 },
+    { type: 'omega', name: 'Mise à jour Forcée', damage: 20 },
+    { type: 'tux', name: 'Open Source Strike', damage: 25, heal: 10 },
+    { type: 'omega', name: 'Obsolescence', damage: 15 },
+    { type: 'tux', name: 'Live USB Boot', damage: 30 },
+    { type: 'omega', name: 'Telemetry Drain', damage: 10 },
+    { type: 'tux', name: 'Sudo Command', damage: 35 },
 ];
 
 export const INITIAL_HEALTH = {
-  tux: 100,
-  omega: 100,
+    tux: 100,
+    omega: 100,
 };
