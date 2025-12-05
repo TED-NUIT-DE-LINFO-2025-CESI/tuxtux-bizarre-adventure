@@ -28,18 +28,20 @@ export interface Scene {
     choices?: Choice[];
     nextScene?: string;
     isBattle?: boolean;
+    bgImage?: string;
 }
 
 // ============================================================================
-// GAME SCENES - Story Content (VERSION CONDENSÉE)
+// GAME SCENES - Story Content
 // ============================================================================
 
 export const SCENES: Record<string, Scene> = {
-    // --- PROLOGUE ---
+    // --- SCÈNE 1 : INTRO ---
     intro: {
         id: 'intro',
         title: 'Scène 1 : Le Choix',
         atmosphere: 'neutral',
+        bgImage: '/backgrounds/intro.png',
         dialogues: [
             { speaker: 'narrator', text: "Ordinateur neuf. Écran brillant. Deux icônes flottent dans le noir." },
             { speaker: 'player', text: "Enfin ma machine ! 6 mois d'économies. Il faut juste choisir l'OS...", position: 'center' },
@@ -47,13 +49,13 @@ export const SCENES: Record<string, Scene> = {
         choices: [
             {
                 id: 1,
-                text: '🟦 WINDOWS 11 (Sécurité apparente)',
+                text: '🟦 WINDOWS 11',
                 nextScene: 'scene_2_updates',
                 consequence: 'La route pavée de bonnes intentions...'
             },
             {
                 id: 2,
-                text: '🐧 LINUX MINT (Liberté totale)',
+                text: '🐧 LINUX MINT',
                 nextScene: 'linux_install',
                 consequence: 'La route de l\'aventure.'
             }
@@ -61,15 +63,15 @@ export const SCENES: Record<string, Scene> = {
     },
 
     // --- BRANCHE WINDOWS ---
-    scene_2_updates: {
+    scene_2_updates: { // <--- C'est ici que Windows nous emmène
         id: 'scene_2_updates',
         title: 'Scène 2 : Patience',
         atmosphere: 'windows',
+        bgImage: '/backgrounds/windows-update.jpg', // Vérifie que cette image existe !
         dialogues: [
             { speaker: 'player', text: "Je reste sur du classique pour mes jeux.", position: 'center' },
             { speaker: 'narrator', text: "[ECRAN] Juste un instant... (30 min plus tard) ... Mise à jour 1 sur 48." },
             { speaker: 'player', text: "Pardon ?! Il est neuf ! *Le ventilateur décolle*", position: 'left' },
-            { speaker: 'player', text: "Ok Alex, reste calme. Va te faire un café.", position: 'left' },
         ],
         nextScene: 'scene_3_account'
     },
@@ -78,16 +80,16 @@ export const SCENES: Record<string, Scene> = {
         id: 'scene_3_account',
         title: 'Scène 3 : Connexion Forcée',
         atmosphere: 'windows',
+        bgImage: '/backgrounds/windows-desktop.jpg',
         dialogues: [
             { speaker: 'clippy', text: "Coucou ! Pour commencer, donnez-moi votre email, téléphone et groupe sanguin.", position: 'right' },
             { speaker: 'player', text: "Non, je veux un compte local 'Moi'.", position: 'left' },
-            { speaker: 'clippy', text: "Impossible avec le Wi-Fi actif. C'est pour votre bien (et nos pubs).", position: 'right' },
-            { speaker: 'player', text: "Tu me forces ? Sérieusement ?", position: 'left' },
+            { speaker: 'clippy', text: "Impossible avec le Wi-Fi actif.", position: 'right' },
         ],
         choices: [
             {
                 id: 1,
-                text: 'Se soumettre (Pas le choix)',
+                text: 'Se soumettre',
                 nextScene: 'scene_4_privacy',
                 consequence: 'Adieu vie privée.'
             }
@@ -96,37 +98,36 @@ export const SCENES: Record<string, Scene> = {
 
     scene_4_privacy: {
         id: 'scene_4_privacy',
-        title: 'Scène 4 : Vie "Privée"',
+        title: 'Scène 4 : Vie Privée',
         atmosphere: 'windows',
+        bgImage: '/backgrounds/windows-settings.jpg',
         dialogues: [
-            { speaker: 'clippy', text: "Configurons la vie privée ! J'ai tout coché 'OUI' par défaut car je vous aime.", position: 'right' },
-            { speaker: 'player', text: "Géolocalisation ? Historique de frappe ? Hors de question ! *Décoche tout*", position: 'left' },
-            { speaker: 'clippy', text: "Vous n'aimez pas les pubs ciblées ? Dommage. Cliquez sur 'Accepter' quand même.", position: 'right' },
+            { speaker: 'clippy', text: "J'ai tout coché 'OUI' par défaut car je vous aime.", position: 'right' },
+            { speaker: 'player', text: "Géolocalisation ? Historique de frappe ? Hors de question !", position: 'left' },
         ],
         nextScene: 'scene_5_eula'
     },
 
     scene_5_eula: {
         id: 'scene_5_eula',
-        title: 'Scène 5 : Lecture Rapide',
+        title: 'Scène 5 : CGU',
         atmosphere: 'windows',
+        // Pas d'image ici -> utilisera le fond bleu par défaut
         dialogues: [
             { speaker: 'clippy', text: "Lisez les 45 000 mots des CGU. Clause 14B : don d'organes numériques.", position: 'right' },
-            { speaker: 'narrator', text: "*BIP ERREUR* Vous n'avez pas lu ! Le bouton est grisé." },
-            { speaker: 'clippy', text: "Je le sais. Scrollez jusqu'au dernier pixel.", position: 'right' },
-            { speaker: 'player', text: "C'est du délire... *Scrolle furieusement pendant 15 secondes*", position: 'left' },
+            { speaker: 'player', text: "C'est du délire... *Scrolle furieusement*", position: 'left' },
         ],
         nextScene: 'scene_6_activation'
     },
 
     scene_6_activation: {
         id: 'scene_6_activation',
-        title: 'Scène 6 : Le Péage',
+        title: 'Scène 6 : Activation',
         atmosphere: 'windows',
+        bgImage: '/backgrounds/windows-key.jpg',
         dialogues: [
-            { speaker: 'clippy', text: "Ordi configuré ! Entrez votre clé produit de 25 caractères.", position: 'right' },
+            { speaker: 'clippy', text: "Entrez votre clé produit.", position: 'right' },
             { speaker: 'player', text: "Je l'ai payé ! Il n'y avait rien dans la boîte !", position: 'left' },
-            { speaker: 'clippy', text: "Aïe. Pas de licence ? Ce sera le mode 'Pauvre' avec filigrane.", position: 'right' },
         ],
         choices: [
             {
@@ -134,12 +135,6 @@ export const SCENES: Record<string, Scene> = {
                 text: 'Accepter le Mode Restreint',
                 nextScene: 'scene_7_desktop',
                 consequence: 'Bienvenue en seconde zone.'
-            },
-            {
-                id: 2,
-                text: 'Payer 145€ (Aïe)',
-                nextScene: 'scene_7_desktop',
-                consequence: 'Portefeuille vide.'
             }
         ]
     },
@@ -148,11 +143,10 @@ export const SCENES: Record<string, Scene> = {
         id: 'scene_7_desktop',
         title: 'Scène 7 : Le Bureau',
         atmosphere: 'chaos',
+        bgImage: '/backgrounds/windows-glitch.jpg',
         dialogues: [
-            { speaker: 'narrator', text: "Bureau noir. Filigrane 'ACTIVER WINDOWS'. Soudain : *DING! POP! DING!*" },
             { speaker: 'narrator', text: "[POPUP] ANTIVIRUS PÉRIMÉ ! OFFICE 365 ! CANDY CRUSH SAGA !" },
             { speaker: 'player', text: "Arrêtez ! Je veux juste Firefox...", position: 'left' },
-            { speaker: 'clippy', text: "ATTENDEZ ! EDGE EST 400% PLUS RAPIDE ! (Vraiment, croyez-nous)", position: 'right' },
         ],
         choices: [
             {
@@ -168,39 +162,35 @@ export const SCENES: Record<string, Scene> = {
         id: 'scene_8_obsolescence',
         title: 'Scène 8 : Trop Vieux',
         atmosphere: 'chaos',
+        bgImage: '/backgrounds/bsod.jpg',
         dialogues: [
-            { speaker: 'narrator', text: "Le PC plante. La souris fige. Ventilateur au max." },
-            { speaker: 'clippy', text: "Oups. Votre processeur i5 est 'philosophiquement' obsolète pour Windows 11.", position: 'right' },
+            { speaker: 'clippy', text: "Oups. Votre processeur est obsolète pour Windows 11.", position: 'right' },
             { speaker: 'player', text: "Je l'ai acheté ce matin !!!", position: 'left' },
-            { speaker: 'clippy', text: "Sécurité compromise. Désactivation des fonctions vitales...", position: 'right' },
         ],
         nextScene: 'scene_9_keynote'
     },
 
     scene_9_keynote: {
         id: 'scene_9_keynote',
-        title: 'Scène 9 : La Transition',
+        title: 'Scène 9 : Transition',
         atmosphere: 'chaos',
+        bgImage: '/backgrounds/gates.jpg',
         dialogues: [
-            { speaker: 'narrator', text: "Écran géant. Bill Gates apparaît : 'Vos PC sont lents ? C'est votre faute.'" },
-            { speaker: 'gates', text: "J'annonce la Grande Transition. Les vieux systèmes seront effacés ce soir.", position: 'center' },
-            { speaker: 'player', text: "Effacés ?! C'est du terrorisme !", position: 'left' },
-            { speaker: 'narrator', text: "Bill mute en WINDOWS BLEU GÉANT. *CRASH!* Tux déchire l'écran !" },
+            { speaker: 'gates', text: "J'annonce la Grande Transition. Effacement ce soir.", position: 'center' },
             { speaker: 'tux', text: "🐧 Besoin d'un root access ?", position: 'right' },
         ],
         nextScene: 'final_battle'
     },
 
     // --- BRANCHE LINUX ---
-    linux_install: {
+    linux_install: { // <--- C'est ici que Linux nous emmène
         id: 'linux_install',
         title: 'Branche Linux - Matrix',
         atmosphere: 'linux',
+        bgImage: '/backgrounds/linux-install.jpg',
         dialogues: [
-            { speaker: 'narrator', text: "Clic sur le Pingouin. Écran noir... Texte blanc défile à toute vitesse." },
+            { speaker: 'narrator', text: "Clic sur le Pingouin. Écran noir... Texte blanc défile." },
             { speaker: 'tux', text: "Installation terminée. Bienvenue.", position: 'right' },
-            { speaker: 'player', text: "Déjà ? En 4 minutes ? Où sont les pubs ?", position: 'left' },
-            { speaker: 'tux', text: "Pas de temps à perdre. On a un système à explorer.", position: 'right' },
         ],
         nextScene: 'linux_terminal'
     },
@@ -209,75 +199,72 @@ export const SCENES: Record<string, Scene> = {
         id: 'linux_terminal',
         title: 'Branche Linux - Terminal',
         atmosphere: 'linux',
+        bgImage: '/backgrounds/terminal.jpg',
         dialogues: [
-            { speaker: 'player', text: "C'est calme. Bon, je vais sur Edge télécharger Steam.exe ?", position: 'left' },
-            { speaker: 'linus', text: "MALHEUREUX ! Pose cette souris !", position: 'right' },
             { speaker: 'linus', text: "Ici on utilise le TERMINAL. La puissance pure.", position: 'right' },
-            { speaker: 'player', text: "La boîte noire des hackers ? J'ai peur...", position: 'left' },
         ],
         choices: [
             {
                 id: 1,
-                text: 'Taper "sudo apt install steam"',
+                text: 'Taper "sudo apt install"',
                 nextScene: 'linux_power',
-                consequence: 'Hacker mode activated.'
+                consequence: 'Hacker mode.'
             },
             {
                 id: 2,
-                text: 'Ouvrir la Logithèque (Facile)',
+                text: 'Logithèque',
                 nextScene: 'linux_gui',
-                consequence: 'Sécurité et simplicité.'
+                consequence: 'Facile.'
             }
         ]
     },
 
     linux_gui: {
         id: 'linux_gui',
-        title: 'Branche Linux - App Store',
+        title: 'Logithèque',
         atmosphere: 'linux',
+        bgImage: '/backgrounds/store.jpg',
         dialogues: [
-            { speaker: 'narrator', text: "Logithèque ouverte. Tout est gratuit, validé, sécurisé." },
-            { speaker: 'player', text: "Comme un App Store sans carte bleue ? Je vais pleurer de joie.", position: 'left' },
-            { speaker: 'narrator', text: "Soudain, une alerte système retentit (une vraie, pas une pub).", position: 'center' },
+            { speaker: 'narrator', text: "Tout est gratuit, validé, sécurisé." },
+            { speaker: 'player', text: "Je vais pleurer de joie.", position: 'left' },
         ],
         nextScene: 'linux_alert'
     },
 
     linux_power: {
         id: 'linux_power',
-        title: 'Branche Linux - Sudo',
+        title: 'Sudo Power',
         atmosphere: 'linux',
+        bgImage: '/backgrounds/matrix.jpg',
         dialogues: [
             { speaker: 'player', text: "$ sudo apt install steam -y", position: 'center' },
-            { speaker: 'narrator', text: "Le texte défile. Vous vous sentez comme NEO dans Matrix.", position: 'center' },
-            { speaker: 'linus', text: "Bien joué. Mais évite 'rm -rf /' si tu tiens à la vie.", position: 'right' },
-            { speaker: 'narrator', text: "Le terminal clignote rouge !", position: 'center' },
+            { speaker: 'linus', text: "Bien joué.", position: 'right' },
         ],
         nextScene: 'linux_alert'
     },
 
     linux_alert: {
         id: 'linux_alert',
-        title: 'Branche Linux - L\'Appel',
+        title: 'Appel aux armes',
         atmosphere: 'chaos',
+        bgImage: '/backgrounds/alert.jpg',
         dialogues: [
-            { speaker: 'tux', text: "ALERTE ! Bill Gates lance l'effacement mondial des vieux PC !", position: 'right' },
-            { speaker: 'player', text: "Mes amis sont sur Windows ! Il faut les aider !", position: 'left' },
-            { speaker: 'linus', text: "Prends cette Clé USB Excalibur. Va et formate le Mal.", position: 'right' },
+            { speaker: 'tux', text: "ALERTE ! Bill Gates efface les vieux PC !", position: 'right' },
+            { speaker: 'linus', text: "Prends cette Clé USB. Formate le Mal.", position: 'right' },
         ],
         nextScene: 'final_battle'
     },
 
-    // --- FINALE COMMUNE ---
+    // --- FINALE ---
     final_battle: {
         id: 'final_battle',
         title: 'COMBAT FINAL',
         atmosphere: 'chaos',
         isBattle: true,
+        bgImage: '/backgrounds/boss.jpg',
         dialogues: [
-            { speaker: 'tux', text: "Recule, abomination propriétaire ! J'ai une clé USB bootable !", position: 'right' },
-            { speaker: 'gates', text: "UNE CLÉ USB ? CONTRE MON CLOUD SOUVERAIN ?", position: 'center' },
-            { speaker: 'player', text: "On formate tout et on installe Mint !", position: 'left' },
+            { speaker: 'tux', text: "Recule, abomination !", position: 'right' },
+            { speaker: 'gates', text: "MAUDITS PINGOUINS !", position: 'center' },
         ],
         nextScene: 'victory'
     },
@@ -286,10 +273,10 @@ export const SCENES: Record<string, Scene> = {
         id: 'victory',
         title: 'Épilogue',
         atmosphere: 'victory',
+        bgImage: '/backgrounds/victory.jpg',
         dialogues: [
-            { speaker: 'narrator', text: "Le Monstre s'effondre en fichiers .tmp. Le PC redémarre en 3 secondes." },
-            { speaker: 'tux', text: "Propre. Libre. Rapide.", position: 'right' },
-            { speaker: 'player', text: "C'est ça, la liberté. Profite, Alex.", position: 'left' },
+            { speaker: 'narrator', text: "Le PC redémarre. Libre." },
+            { speaker: 'tux', text: "Propre. Rapide.", position: 'right' },
         ],
         choices: [
             { id: 0, text: '🔄 Rejouer', nextScene: 'intro' }

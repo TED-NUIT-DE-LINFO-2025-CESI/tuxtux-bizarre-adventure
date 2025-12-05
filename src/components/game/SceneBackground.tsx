@@ -4,111 +4,84 @@ import type { Atmosphere } from '../../data/scenes';
 
 interface SceneBackgroundProps {
     atmosphere: Atmosphere;
+    customBg?: string;
     enableSelection?: boolean;
     onChoose?: (side: 'linux' | 'windows') => void;
 }
 
-// Styles de fond pour le conteneur global (au cas où les images ne chargent pas)
-const atmosphereStyles: Record<Atmosphere, string> = {
+// Couleurs de secours si l'image plante
+const bgColors: Record<Atmosphere, string> = {
     neutral: 'bg-gray-900',
     windows: 'bg-blue-900',
-    linux: 'bg-green-900',
+    linux: 'bg-green-800',
     chaos: 'bg-red-900',
-    victory: 'bg-yellow-900',
+    victory: 'bg-yellow-700',
 };
 
-export const SceneBackground = memo(({ atmosphere, enableSelection = false, onChoose }: SceneBackgroundProps) => {
-    const isChaos = atmosphere === 'chaos';
+export const SceneBackground = memo(({ atmosphere, customBg, enableSelection = false, onChoose }: SceneBackgroundProps) => {
 
-    // Chemins des images (Vérifie bien que ces fichiers sont dans public/backgrounds/)
-    const imageGauche = "/backgrounds/linux.png";
-    const imageDroite = "/backgrounds/windows.png";
+    // Affiche le Split Screen SEULEMENT si c'est l'intro et qu'on doit choisir
+    const showSplitScreen = atmosphere === 'neutral' && enableSelection;
 
-    // --- LOGIQUE ROBUSTE DES LARGEURS ---
-    // On utilise des pourcentages explicites pour Framer Motion
-    let widthLinux = "50%";
-    let widthWindows = "50%";
-
-    if (atmosphere === 'linux') {
-        widthLinux = "100%";
-        widthWindows = "0%";
-    } else if (atmosphere === 'windows') {
-        widthLinux = "0%";
-        widthWindows = "100%";
+    // Si on a une image custom (et qu'on n'est pas en train de choisir dans l'intro)
+    if (!showSplitScreen && customBg) {
+        return (
+            <motion.div
+                key="custom-bg"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+                className={`absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat ${bgColors[atmosphere]}`}
+                style={{ backgroundImage: `url('${customBg}')` }}
+            >
+                <div className="absolute inset-0 bg-black/40" />
+            </motion.div>
+        );
     }
 
-    const handleClick = (side: 'linux' | 'windows', e: React.MouseEvent) => {
-        if (!enableSelection) return;
-        e.stopPropagation();
-        if (onChoose) onChoose(side);
-    };
+    // Si pas d'image et pas de split screen -> Couleur unie (Fallback)
+    if (!showSplitScreen && !customBg) {
+        return (
+            <motion.div
+                key="color-bg"
+                className={`absolute inset-0 w-full h-full ${bgColors[atmosphere]}`}
+            />
+        );
+    }
 
-    const interactifClass = enableSelection
-        ? "cursor-pointer hover:border-yellow-400 hover:brightness-110 active:scale-[0.99] z-50"
-        : "cursor-default z-0 brightness-100"; // J'ai remis brightness-100 pour éviter que ce soit trop sombre après le choix
-
+    // Sinon -> Split Screen (Intro Choix)
     return (
         <motion.div
-            className={`absolute inset-0 flex w-full h-full overflow-hidden ${atmosphereStyles[atmosphere]}`}
+            key="split-screen"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="absolute inset-0 flex w-full h-full"
         >
-            {/* --- CÔTÉ GAUCHE (Linux) --- */}
-            <motion.div
-                // C'EST ICI QUE CA CHANGE : On utilise 'animate' pour forcer la largeur
-                initial={false}
-                animate={{ width: widthLinux }}
-                transition={{ duration: 0.8, ease: "easeInOut" }}
-
-                onClick={(e) => handleClick('linux', e)}
-
-                // J'ai ajouté bg-green-900 comme couleur de fond de secours si l'image foire
-                className={`relative h-full bg-green-900 bg-center bg-no-repeat overflow-hidden border-r border-black/50 ${interactifClass}`}
-                style={{
-                    backgroundImage: `url('${imageGauche}')`,
-                    backgroundSize: 'cover'
-                }}
+            <div
+                onClick={(e) => { e.stopPropagation(); onChoose?.('linux'); }}
+                className={`relative w-1/2 h-full bg-green-900 bg-cover bg-center border-r border-black/50 ${enableSelection ? 'cursor-pointer hover:brightness-110' : ''}`}
+                style={{ backgroundImage: "url('/backgrounds/linux.png')" }}
             >
                 {enableSelection && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 hover:opacity-100 transition-opacity duration-300">
-                    <span className="text-green-400 font-bold text-3xl uppercase tracking-widest border-2 border-green-400 px-6 py-2 rounded pointer-events-none">
-                        Choisir Linux
-                    </span>
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 hover:opacity-100 transition-opacity">
+                        <span className="text-green-400 font-bold text-2xl border-2 border-green-400 px-4 py-2 rounded">LINUX</span>
                     </div>
                 )}
-            </motion.div>
-
-            {/* --- CÔTÉ DROIT (Windows) --- */}
-            <motion.div
-                initial={false}
-                animate={{ width: widthWindows }}
-                transition={{ duration: 0.8, ease: "easeInOut" }}
-
-                onClick={(e) => handleClick('windows', e)}
-
-                // Couleur de secours bleue
-                className={`relative h-full bg-blue-900 bg-center bg-no-repeat overflow-hidden border-l border-black/50 ${interactifClass}`}
-                style={{
-                    backgroundImage: `url('${imageDroite}')`,
-                    backgroundSize: 'cover'
-                }}
-            >
-                {enableSelection && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 hover:opacity-100 transition-opacity duration-300">
-                     <span className="text-blue-400 font-bold text-3xl uppercase tracking-widest border-2 border-blue-400 px-6 py-2 rounded pointer-events-none">
-                        Choisir Windows
-                    </span>
-                    </div>
-                )}
-            </motion.div>
-
-            {/* --- DÉCORATIONS --- */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none z-10">
-                {/* Overlay pour assombrir légèrement et unifier */}
-                <div className="absolute inset-0 bg-black/20" />
             </div>
 
+            <div
+                onClick={(e) => { e.stopPropagation(); onChoose?.('windows'); }}
+                className={`relative w-1/2 h-full bg-blue-900 bg-cover bg-center border-l border-black/50 ${enableSelection ? 'cursor-pointer hover:brightness-110' : ''}`}
+                style={{ backgroundImage: "url('/backgrounds/windows.png')" }}
+            >
+                {enableSelection && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 hover:opacity-100 transition-opacity">
+                        <span className="text-blue-400 font-bold text-2xl border-2 border-blue-400 px-4 py-2 rounded">WINDOWS</span>
+                    </div>
+                )}
+            </div>
         </motion.div>
     );
 });
-
 
 SceneBackground.displayName = 'SceneBackground';

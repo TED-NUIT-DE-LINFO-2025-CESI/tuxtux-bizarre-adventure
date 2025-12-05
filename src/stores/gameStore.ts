@@ -1,181 +1,163 @@
-import { useMemo } from 'react';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import { SCENES, INITIAL_HEALTH, BATTLE_ATTACKS, type Scene, type Choice } from '../data/scenes';
+import { SCENES, BATTLE_ATTACKS, type BattleAttack } from '../data/scenes';
 
-// ============================================================================
-// TYPES
-// ============================================================================
-
-type GamePath = 'windows' | 'linux' | null;
-
-interface Health {
-  tux: number;
-  omega: number;
-}
+// --- TYPES ---
 
 interface GameState {
-  // State
-  currentSceneId: string;
-  dialogueIndex: number;
-  showChoices: boolean;
-  showBattle: boolean;
-  path: GamePath;
-  health: Health;
-  battlePhase: number;
-
-  // Computed
-  getCurrentScene: () => Scene;
-  getCurrentDialogue: () => Scene['dialogues'][number] | null;
-  isLastDialogue: () => boolean;
-
-  // Actions
-  nextDialogue: () => void;
-  transitionToScene: (sceneId: string) => void;
-  makeChoice: (choice: Choice) => void;
-  processBattlePhase: () => { isComplete: boolean; attack?: typeof BATTLE_ATTACKS[number]; newHealth?: Health };
-  completeBattle: () => void;
-  resetBattle: () => void;
-  resetGame: () => void;
+    currentSceneId: string;
+    dialogueIndex: number;
+    showChoices: boolean;
+    showBattle: boolean;
+    path: 'windows' | 'linux' | null;
+    health: {
+        tux: number;
+        omega: number;
+    };
+    battlePhase: number;
 }
 
-// ============================================================================
-// INITIAL STATE
-// ============================================================================
+interface GameActions {
+    nextDialogue: () => void;
+    makeChoice: (choiceId: number) => void;
+    processBattlePhase: () => { isComplete: boolean; attack?: BattleAttack; newHealth?: { tux: number; omega: number } };
+    completeBattle: () => void;
+    resetGame: () => void;
+}
 
-const initialState = {
-  currentSceneId: 'intro',
-  dialogueIndex: 0,
-  showChoices: false,
-  showBattle: false,
-  path: null as GamePath,
-  health: { ...INITIAL_HEALTH },
-  battlePhase: 0,
+type GameStore = GameState & { actions: GameActions };
+
+// --- STORE ---
+
+const INITIAL_STATE: GameState = {
+    currentSceneId: 'intro',
+    dialogueIndex: 0,
+    showChoices: false,
+    showBattle: false,
+    path: null,
+    health: { tux: 100, omega: 100 },
+    battlePhase: 0,
 };
 
-// ============================================================================
-// STORE
-// ============================================================================
+const useGameStore = create<GameStore>()(
+    devtools(
+        persist(
+            (set, get) => ({
+                ...INITIAL_STATE,
 
-export const useGameStore = create<GameState>()(
-  devtools(
-    persist(
-      (set, get) => ({
-        ...initialState,
+                actions: {
+                    nextDialogue: () => {
+                        const state = get();
+                        const scene = SCENES[state.currentSceneId];
 
-        // Computed
-        getCurrentScene: () => SCENES[get().currentSceneId],
+                        if (!scene) return;
 
-        getCurrentDialogue: () => {
-          const scene = SCENES[get().currentSceneId];
-          return scene?.dialogues[get().dialogueIndex] || null;
-        },
+                        // Si c'est un combat, on ne gère pas les dialogues classiques
+                        if (scene.isBattle) {
+                            set({ showBattle: true });
+                            return;
+                        }
 
-        isLastDialogue: () => {
-          const scene = SCENES[get().currentSceneId];
-          return get().dialogueIndex === scene?.dialogues.length - 1;
-        },
+                        // S'il reste des dialogues, on avance
+                        if (state.dialogueIndex < scene.dialogues.length - 1) {
+                            set({ dialogueIndex: state.dialogueIndex + 1 });
+                        } else {
+                            // Fin des dialogues : Si choix, on les affiche. Sinon, scène suivante.
+                            if (scene.choices && scene.choices.length > 0) {
+                                set({ showChoices: true });
+                            } else if (scene.nextScene) {
+                                // Transition automatique vers la scène suivante
+                                set({
+                                    currentSceneId: scene.nextScene,
+                                    dialogueIndex: 0,
+                                    showChoices: false
+                                });
+                            }
+                        }
+                    },
 
-        // Actions
-        nextDialogue: () => {
-          const state = get();
-          const scene = SCENES[state.currentSceneId];
+                    makeChoice: (choiceId: number) => {
+                        const state = get();
+                        const scene = SCENES[state.currentSceneId];
 
-          if (state.dialogueIndex < scene.dialogues.length - 1) {
-            set({ dialogueIndex: state.dialogueIndex + 1 }, false, 'nextDialogue');
-          } else if (scene.isBattle) {
-            set({ showBattle: true }, false, 'showBattle');
-          } else if (scene.choices) {
-            set({ showChoices: true }, false, 'showChoices');
-          } else if (scene.nextScene) {
-            get().transitionToScene(scene.nextScene);
-          }
-        },
+                        if (!scene || !scene.choices) return;
 
-        transitionToScene: (sceneId) => {
-          set({
-            currentSceneId: sceneId,
-            dialogueIndex: 0,
-            showChoices: false,
-            showBattle: false,
-          }, false, 'transitionToScene');
-        },
+                        // --- CORRECTION CRITIQUE ICI ---
+                        // On cherche le choix qui correspond à l'ID (1 ou 2)
+                        const choice = scene.choices.find((c) => c.id === choiceId);
 
-        makeChoice: (choice) => {
-          const updates: Partial<GameState> = {
-            currentSceneId: choice.nextScene,
-            dialogueIndex: 0,
-            showChoices: false,
-            showBattle: false,
-          };
+                        if (choice) {
+                            // Détection du chemin (Path) pour le Header
+                            let newPath = state.path;
+                            if (choice.text.toLowerCase().includes('linux')) newPath = 'linux';
+                            if (choice.text.toLowerCase().includes('windows')) newPath = 'windows';
 
-          if (choice.nextScene === 'windows_path') {
-            updates.path = 'windows';
-          } else if (choice.nextScene === 'linux_path') {
-            updates.path = 'linux';
-          }
+                            set({
+                                currentSceneId: choice.nextScene, // On passe à la string 'scene_2_updates' etc.
+                                dialogueIndex: 0,
+                                showChoices: false,
+                                path: newPath
+                            });
+                        } else {
+                            console.error(`Choix ID ${choiceId} introuvable dans la scène ${state.currentSceneId}`);
+                        }
+                    },
 
-          set(updates as GameState, false, 'makeChoice');
-        },
+                    processBattlePhase: () => {
+                        const state = get();
+                        const attackIndex = state.battlePhase;
 
-        processBattlePhase: () => {
-          const { battlePhase, health } = get();
+                        if (attackIndex >= BATTLE_ATTACKS.length) {
+                            return { isComplete: true };
+                        }
 
-          if (battlePhase >= BATTLE_ATTACKS.length) {
-            return { isComplete: true };
-          }
+                        const attack = BATTLE_ATTACKS[attackIndex];
+                        const newHealth = { ...state.health };
 
-          const attack = BATTLE_ATTACKS[battlePhase];
-          const newHealth = { ...health };
+                        // Application des dégâts
+                        if (attack.type === 'tux') {
+                            newHealth.omega = Math.max(0, newHealth.omega - attack.damage);
+                            if (attack.heal) {
+                                newHealth.tux = Math.min(100, newHealth.tux + attack.heal);
+                            }
+                        } else {
+                            newHealth.tux = Math.max(0, newHealth.tux - attack.damage);
+                        }
 
-          if (attack.type === 'tux') {
-            newHealth.omega = Math.max(0, health.omega - attack.damage);
-            if (attack.heal) {
-              newHealth.tux = Math.min(100, health.tux + attack.heal);
+                        set({
+                            health: newHealth,
+                            battlePhase: state.battlePhase + 1
+                        });
+
+                        return { isComplete: false, attack, newHealth };
+                    },
+
+                    completeBattle: () => {
+                        const state = get();
+                        const scene = SCENES[state.currentSceneId];
+                        if (scene && scene.nextScene) {
+                            set({
+                                currentSceneId: scene.nextScene,
+                                dialogueIndex: 0,
+                                showBattle: false,
+                                showChoices: false
+                            });
+                        }
+                    },
+
+                    resetGame: () => {
+                        set(INITIAL_STATE);
+                    }
+                },
+            }),
+            {
+                name: 'tux-adventure-storage', // Nom pour le localStorage
             }
-          } else {
-            newHealth.tux = Math.max(0, health.tux - attack.damage);
-          }
-
-          set({
-            health: newHealth,
-            battlePhase: battlePhase + 1,
-          }, false, 'processBattlePhase');
-
-          return {
-            isComplete: false,
-            attack,
-            newHealth,
-          };
-        },
-
-        completeBattle: () => {
-          const scene = SCENES[get().currentSceneId];
-          if (scene.nextScene) {
-            get().transitionToScene(scene.nextScene);
-          }
-        },
-
-        resetBattle: () => {
-          set({
-            health: { ...INITIAL_HEALTH },
-            battlePhase: 0,
-          }, false, 'resetBattle');
-        },
-
-        resetGame: () => {
-          set(initialState, false, 'resetGame');
-        },
-      }),
-      { name: 'tux-game-store' }
-    ),
-    { name: 'game-store' }
-  )
+        )
+    )
 );
 
-// ============================================================================
-// SELECTOR HOOKS - Optimized re-renders
-// ============================================================================
+// --- HOOKS EXPORTÉS (Ceux utilisés dans VisualNovel.tsx) ---
 
 export const useCurrentScene = () => useGameStore((state) => SCENES[state.currentSceneId]);
 export const useDialogueIndex = () => useGameStore((state) => state.dialogueIndex);
@@ -183,19 +165,4 @@ export const useShowChoices = () => useGameStore((state) => state.showChoices);
 export const useShowBattle = () => useGameStore((state) => state.showBattle);
 export const usePath = () => useGameStore((state) => state.path);
 export const useHealth = () => useGameStore((state) => state.health);
-export const useBattlePhase = () => useGameStore((state) => state.battlePhase);
-
-// Actions - accessed directly from store (stable references)
-export const getGameActions = () => ({
-  nextDialogue: useGameStore.getState().nextDialogue,
-  makeChoice: useGameStore.getState().makeChoice,
-  transitionToScene: useGameStore.getState().transitionToScene,
-  processBattlePhase: useGameStore.getState().processBattlePhase,
-  completeBattle: useGameStore.getState().completeBattle,
-  resetGame: useGameStore.getState().resetGame,
-});
-
-// Hook version with useMemo for stable reference
-export const useGameActions = () => {
-  return useMemo(() => getGameActions(), []);
-};
+export const useGameActions = () => useGameStore((state) => state.actions);
