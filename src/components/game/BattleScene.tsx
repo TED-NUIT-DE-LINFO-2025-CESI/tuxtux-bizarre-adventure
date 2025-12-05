@@ -74,6 +74,8 @@ export const BattleScene = memo(({ onVictory, onDefeat }: BattleSceneProps) => {
   const tbcArrowRef = useRef<HTMLDivElement | null>(null);
   const restartHandlerRef = useRef<(() => void) | null>(null);
   const [winner, setWinner] = useState<Winner>(null);
+  const [showVictoryVideo, setShowVictoryVideo] = useState(false);
+  const [videoEnded, setVideoEnded] = useState(false);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -762,6 +764,11 @@ export const BattleScene = memo(({ onVictory, onDefeat }: BattleSceneProps) => {
       winnerTextEl.textContent = didPlayerWin
         ? 'Linux remporte la victoire !'
         : 'Windows a pris le dessus...';
+
+      if (didPlayerWin) {
+        setShowVictoryVideo(true);
+      }
+
       gameOverEl.classList.add('active');
 
       if (didPlayerWin) {
@@ -920,11 +927,28 @@ export const BattleScene = memo(({ onVictory, onDefeat }: BattleSceneProps) => {
         <div id="fx-layer" ref={fxLayerRef} />
 
         <div id="game-over" className="ko-screen" ref={gameOverRef}>
-          <h1>{winner === 'linux' ? 'VICTOIRE' : 'K.O.'}</h1>
-          <div className="winner-text" id="winner-text" ref={winnerTextRef} />
-          <button className="retry-button" onClick={handlePrimaryAction}>
-            {winner === 'linux' ? 'Continuer' : 'Retry'}
-          </button>
+          {showVictoryVideo && !videoEnded ? (
+            <div className="victory-video-container" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 50, background: 'black' }}>
+              <video
+                src={`${BASE}tux_finish_him.mp4`}
+                autoPlay
+                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                onEnded={() => setVideoEnded(true)}
+              />
+            </div>
+          ) : (
+            <>
+              <h1>{winner === 'linux' ? 'VICTOIRE' : 'K.O.'}</h1>
+              <div className="winner-text" id="winner-text" ref={winnerTextRef} />
+              <button
+                className="retry-button"
+                onClick={handlePrimaryAction}
+                style={winner === 'linux' ? { background: '#4CAF50', borderColor: '#45a049' } : {}}
+              >
+                {winner === 'linux' ? 'Terminer' : 'Retry'}
+              </button>
+            </>
+          )}
         </div>
 
         <div className="to-be-continued" id="tbc-arrow" ref={tbcArrowRef}>
