@@ -15,6 +15,7 @@ export const ChoicePanel = memo(({ choices, onChoice }: ChoicePanelProps) => {
       exit={{ opacity: 0, scale: 0.9 }}
       className="space-y-4"
     >
+        <img src=""/>
       <h3 className="text-center text-gray-400 text-lg mb-6">
         Faites votre choix...
       </h3>

@@ -3,72 +3,85 @@ import { motion } from 'motion/react';
 import type { Atmosphere } from '../../data/scenes';
 
 interface SceneBackgroundProps {
-  atmosphere: Atmosphere;
+    atmosphere: Atmosphere;
+    customBg?: string;
+    enableSelection?: boolean;
+    onChoose?: (side: 'linux' | 'windows') => void;
 }
 
-const atmosphereStyles: Record<Atmosphere, string> = {
-  neutral: 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900',
-  windows: 'bg-gradient-to-br from-blue-950 via-blue-900 to-indigo-950',
-  linux: 'bg-gradient-to-br from-green-950 via-emerald-900 to-green-950',
-  chaos: 'bg-gradient-to-br from-red-950 via-purple-900 to-red-950',
-  victory: 'bg-gradient-to-br from-yellow-900 via-amber-800 to-yellow-900',
+// Couleurs de secours si l'image plante
+const bgColors: Record<Atmosphere, string> = {
+    neutral: 'bg-gray-900',
+    windows: 'bg-blue-900',
+    linux: 'bg-green-800',
+    chaos: 'bg-red-900',
+    victory: 'bg-yellow-700',
 };
 
-export const SceneBackground = memo(({ atmosphere }: SceneBackgroundProps) => {
-  const isChaos = atmosphere === 'chaos';
+export const SceneBackground = memo(({ atmosphere, customBg, enableSelection = false, onChoose }: SceneBackgroundProps) => {
 
-  return (
-    <motion.div
-      key={atmosphere}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className={`absolute inset-0 ${atmosphereStyles[atmosphere]}`}
-    >
-      {/* Animated particles/stars */}
-      <div className="absolute inset-0 overflow-hidden">
-        {[...Array(20)].map((_, i) => (
-          <motion.div
-            key={i}
-            className={`absolute w-1 h-1 rounded-full ${
-              isChaos ? 'bg-red-500' : 'bg-white'
-            }`}
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              opacity: [0.2, 0.8, 0.2],
-              scale: [1, 1.5, 1],
-            }}
-            transition={{
-              duration: 2 + Math.random() * 2,
-              repeat: Infinity,
-              delay: Math.random() * 2,
-            }}
-          />
-        ))}
-      </div>
+    // Affiche le Split Screen SEULEMENT si c'est l'intro et qu'on doit choisir
+    const showSplitScreen = atmosphere === 'neutral' && enableSelection;
 
-      {/* Chaos glitch effect */}
-      {isChaos && (
+    // Si on a une image custom (et qu'on n'est pas en train de choisir dans l'intro)
+    if (!showSplitScreen && customBg) {
+        return (
+            <motion.div
+                key="custom-bg"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+                className={`absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat ${bgColors[atmosphere]}`}
+                style={{ backgroundImage: `url('${customBg}')` }}
+            >
+                <div className="absolute inset-0 bg-black/40" />
+            </motion.div>
+        );
+    }
+
+    // Si pas d'image et pas de split screen -> Couleur unie (Fallback)
+    if (!showSplitScreen && !customBg) {
+        return (
+            <motion.div
+                key="color-bg"
+                className={`absolute inset-0 w-full h-full ${bgColors[atmosphere]}`}
+            />
+        );
+    }
+
+    // Sinon -> Split Screen (Intro Choix)
+    return (
         <motion.div
-          className="absolute inset-0 bg-red-500/10"
-          animate={{
-            opacity: [0, 0.3, 0],
-          }}
-          transition={{
-            duration: 0.1,
-            repeat: Infinity,
-            repeatDelay: 2,
-          }}
-        />
-      )}
+            key="split-screen"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="absolute inset-0 flex w-full h-full"
+        >
+            <div
+                onClick={(e) => { e.stopPropagation(); onChoose?.('linux'); }}
+                className={`relative w-1/2 h-full bg-green-900 bg-cover bg-center border-r border-black/50 ${enableSelection ? 'cursor-pointer hover:brightness-110' : ''}`}
+                style={{ backgroundImage: "url('/backgrounds/linux.png')" }}
+            >
+                {enableSelection && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 hover:opacity-100 transition-opacity">
+                        <span className="text-green-400 font-bold text-2xl border-2 border-green-400 px-4 py-2 rounded">LINUX</span>
+                    </div>
+                )}
+            </div>
 
-      {/* Overlay gradient */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/30" />
-    </motion.div>
-  );
+            <div
+                onClick={(e) => { e.stopPropagation(); onChoose?.('windows'); }}
+                className={`relative w-1/2 h-full bg-blue-900 bg-cover bg-center border-l border-black/50 ${enableSelection ? 'cursor-pointer hover:brightness-110' : ''}`}
+                style={{ backgroundImage: "url('/backgrounds/windows.png')" }}
+            >
+                {enableSelection && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 hover:opacity-100 transition-opacity">
+                        <span className="text-blue-400 font-bold text-2xl border-2 border-blue-400 px-4 py-2 rounded">WINDOWS</span>
+                    </div>
+                )}
+            </div>
+        </motion.div>
+    );
 });
 
 SceneBackground.displayName = 'SceneBackground';
