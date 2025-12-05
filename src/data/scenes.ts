@@ -14,6 +14,7 @@ export interface Dialogue {
 }
 
 export interface Choice {
+    id: number;
   text: string;
   nextScene: string;
   consequence?: string;
@@ -44,11 +45,13 @@ export const SCENES: Record<string, Scene> = {
     ],
     choices: [
       {
+        id: 1,
         text: '💠 Rejoindre le Monde Windows',
         nextScene: 'windows_path',
         consequence: 'Le confort... mais a quel prix ?'
       },
       {
+        id: 1,
         text: '🐧 Defendre l\'Ecole Linux',
         nextScene: 'linux_path',
         consequence: 'La liberte se merite'
@@ -171,7 +174,7 @@ export const SCENES: Record<string, Scene> = {
       { speaker: 'narrator', text: "🐧 FIN 🐧" },
     ],
     choices: [
-      { text: '🔄 Rejouer', nextScene: 'intro' }
+      {id: 0 ,text: '🔄 Rejouer', nextScene: 'intro' }
     ]
   }
 };
